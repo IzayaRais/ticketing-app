@@ -83,8 +83,12 @@ function DashboardContent() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
-            <div className="w-16 h-16 border-4 border-maroon-100 border-t-maroon-500 rounded-full animate-spin"></div>
-            <Sparkles className="w-6 h-6 text-maroon-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+            <div className="w-20 h-20 bg-gradient-to-br from-maroon-600 to-maroon-800 rounded-2xl flex items-center justify-center shadow-lg shadow-maroon-700/30 animate-pulse">
+              <Ticket className="w-10 h-10 text-white" />
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center border-2 border-white">
+              <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
+            </div>
           </div>
           <p className="text-slate-500 font-medium">Loading your dashboard...</p>
         </div>

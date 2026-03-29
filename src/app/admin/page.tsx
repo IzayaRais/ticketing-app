@@ -28,7 +28,7 @@ interface Ticket {
   timestamp: string;
 }
 
-const universities = ["MIST", "BUET", "DU", "BRAC", "NSU", "AIUB", "IUT", "RUET", "CUET", "KUET", "SUST", "AFMC", "BUP", "Other"];
+const universities = ["MIST", "BUP", "AFMC"];
 const bloodGroups = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
 
 interface StatCard {

@@ -2,19 +2,8 @@ import { z } from "zod";
 
 export const institutes = [
   "MIST",
-  "BUET",
-  "DU",
-  "BRAC",
-  "NSU",
-  "AIUB",
-  "IUT",
-  "RUET",
-  "CUET",
-  "KUET",
-  "SUST",
-  "AFMC",
   "BUP",
-  "Other",
+  "AFMC",
 ] as const;
 
 export const registrationSchema = z.object({

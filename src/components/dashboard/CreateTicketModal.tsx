@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check } from 'lucide-react';
-import { TicketCategory, TicketPriority } from '@/types/ticket';
+import { Category, Priority } from '@/types';
 import { useTickets } from '@/context/TicketContext';
 
 interface CreateTicketModalProps {
@@ -16,22 +16,22 @@ export const CreateTicketModal = ({ isOpen, onClose }: CreateTicketModalProps) =
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'Bug' as TicketCategory,
-    priority: 'Medium' as TicketPriority,
+    category: 'bug' as Category,
+    priority: 'medium' as Priority,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addTicket({
       ...formData,
-      status: 'Open',
+      status: 'open',
     });
     onClose();
     setFormData({
       title: '',
       description: '',
-      category: 'Bug',
-      priority: 'Medium',
+      category: 'bug',
+      priority: 'medium',
     });
   };
 
@@ -83,26 +83,26 @@ export const CreateTicketModal = ({ isOpen, onClose }: CreateTicketModalProps) =
                   <label className="text-[10px] uppercase tracking-widest font-black text-slate-500 ml-1">Type</label>
                   <select 
                     value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value as TicketCategory })}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value as Category })}
                     className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all font-semibold"
                   >
-                    <option>Bug</option>
-                    <option>Feature Request</option>
-                    <option>Technical Support</option>
-                    <option>Billing</option>
+                    <option value="bug">Bug</option>
+                    <option value="feature">Feature Request</option>
+                    <option value="question">Question</option>
+                    <option value="task">Task</option>
                   </select>
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-black text-slate-500 ml-1">Priority</label>
                   <select 
                     value={formData.priority}
-                    onChange={(e) => setFormData({ ...formData, priority: e.target.value as TicketPriority })}
+                    onChange={(e) => setFormData({ ...formData, priority: e.target.value as Priority })}
                     className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all font-semibold"
                   >
-                    <option>Low</option>
-                    <option>Medium</option>
-                    <option>High</option>
-                    <option>Urgent</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
                   </select>
                 </div>
               </div>

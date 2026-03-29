@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { signIn } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { motion } from "framer-motion";
 import { 
   Users, UserCheck, UserX, Download, Search, 
@@ -39,11 +39,16 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (status === "authenticated") {
+      const userRole = (session?.user as any)?.role;
+      if (userRole !== "admin") {
+        setLoading(false);
+        return;
+      }
       fetchData();
     } else if (status === "unauthenticated") {
       setLoading(false);
     }
-  }, [status]);
+  }, [status, session]);
 
   const fetchData = async () => {
     try {
@@ -131,6 +136,26 @@ export default function AdminDashboard() {
               className="btn-primary px-8 py-3 rounded-xl"
             >
               Sign In with Google
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (status === "authenticated" && (session?.user as any)?.role !== "admin") {
+    return (
+      <main className="min-h-screen bg-offwhite">
+        <Navbar />
+        <div className="pt-20 flex items-center justify-center min-h-[60vh]">
+          <div className="card-premium p-10 text-center max-w-md">
+            <h2 className="text-2xl font-black text-maroon-950 mb-4">Access Denied</h2>
+            <p className="text-slate-400 mb-6">You do not have permission to access the admin dashboard.</p>
+            <button
+              onClick={() => signOut()}
+              className="btn-primary px-8 py-3 rounded-xl"
+            >
+              Sign Out
             </button>
           </div>
         </div>

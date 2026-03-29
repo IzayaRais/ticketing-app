@@ -2,6 +2,8 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
+const ADMIN_EMAIL = "raisultensors@gmail.com";
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
@@ -37,12 +39,15 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        const email = user.email?.toLowerCase();
+        token.role = email === ADMIN_EMAIL.toLowerCase() ? "admin" : "user";
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         (session.user as any).id = token.id;
+        (session.user as any).role = token.role;
       }
       return session;
     },

@@ -36,11 +36,22 @@ export const authOptions: NextAuthOptions = {
     signIn: "/auth/signin",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        const email = user.email?.toLowerCase();
+        (user as any).role = email === ADMIN_EMAIL.toLowerCase() ? "admin" : "user";
+      }
+      return true;
+    },
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        const email = user.email?.toLowerCase();
-        token.role = email === ADMIN_EMAIL.toLowerCase() ? "admin" : "user";
+        if (account?.provider === "google") {
+          const email = user.email?.toLowerCase();
+          token.role = email === ADMIN_EMAIL.toLowerCase() ? "admin" : "user";
+        } else {
+          token.role = "user";
+        }
       }
       return token;
     },

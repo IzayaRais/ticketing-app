@@ -28,6 +28,9 @@ interface Ticket {
   timestamp: string;
 }
 
+const universities = ["MIST", "BUET", "DU", "BRAC", "NSU", "AIUB", "IUT", "RUET", "CUET", "KUET", "SUST", "AFMC", "BUP", "Other"];
+const bloodGroups = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
+
 interface StatCard {
   label: string;
   value: number;
@@ -44,9 +47,13 @@ export default function AdminDashboard() {
   const [sortField, setSortField] = useState<SortField>("timestamp");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [genderFilter, setGenderFilter] = useState<string>("all");
+  const [universityFilter, setUniversityFilter] = useState<string>("all");
+  const [bloodGroupFilter, setBloodGroupFilter] = useState<string>("all");
+  const [dateFilter, setDateFilter] = useState<string>("all");
   const [stats, setStats] = useState<any>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [activeFilterCount, setActiveFilterCount] = useState(0);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -60,6 +67,23 @@ export default function AdminDashboard() {
       setLoading(false);
     }
   }, [status, session]);
+
+  useEffect(() => {
+    let count = 0;
+    if (genderFilter !== "all") count++;
+    if (universityFilter !== "all") count++;
+    if (bloodGroupFilter !== "all") count++;
+    if (dateFilter !== "all") count++;
+    setActiveFilterCount(count);
+  }, [genderFilter, universityFilter, bloodGroupFilter, dateFilter]);
+
+  const clearAllFilters = () => {
+    setGenderFilter("all");
+    setUniversityFilter("all");
+    setBloodGroupFilter("all");
+    setDateFilter("all");
+    setSearch("");
+  };
 
   const fetchData = async () => {
     try {
@@ -89,9 +113,34 @@ export default function AdminDashboard() {
         t.fullName.toLowerCase().includes(search.toLowerCase()) ||
         t.email.toLowerCase().includes(search.toLowerCase()) ||
         t.university.toLowerCase().includes(search.toLowerCase()) ||
-        t.ticketId.toLowerCase().includes(search.toLowerCase());
+        t.ticketId.toLowerCase().includes(search.toLowerCase()) ||
+        t.studentId.toLowerCase().includes(search.toLowerCase());
       const matchesGender = genderFilter === "all" || t.gender === genderFilter;
-      return matchesSearch && matchesGender;
+      const matchesUniversity = universityFilter === "all" || t.university === universityFilter;
+      const matchesBloodGroup = bloodGroupFilter === "all" || t.bloodGroup === bloodGroupFilter;
+      
+      let matchesDate = true;
+      if (dateFilter !== "all") {
+        const ticketDate = new Date(t.timestamp);
+        const now = new Date();
+        if (dateFilter === "today") {
+          matchesDate = ticketDate.toDateString() === now.toDateString();
+        } else if (dateFilter === "yesterday") {
+          const yesterday = new Date(now);
+          yesterday.setDate(yesterday.getDate() - 1);
+          matchesDate = ticketDate.toDateString() === yesterday.toDateString();
+        } else if (dateFilter === "week") {
+          const weekAgo = new Date(now);
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          matchesDate = ticketDate >= weekAgo;
+        } else if (dateFilter === "month") {
+          const monthAgo = new Date(now);
+          monthAgo.setMonth(monthAgo.getMonth() - 1);
+          matchesDate = ticketDate >= monthAgo;
+        }
+      }
+      
+      return matchesSearch && matchesGender && matchesUniversity && matchesBloodGroup && matchesDate;
     })
     .sort((a, b) => {
       let aVal: string | number = a[sortField] as string;
@@ -351,14 +400,19 @@ export default function AdminDashboard() {
                 </div>
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`flex items-center gap-2 px-4 py-2.5 border rounded-xl text-sm font-medium transition-all ${
-                    showFilters || genderFilter !== "all" 
+                  className={`flex items-center gap-2 px-4 py-2.5 border rounded-xl text-sm font-medium transition-all relative ${
+                    showFilters || activeFilterCount > 0
                       ? "border-maroon-700 bg-maroon-50 text-maroon-700" 
                       : "border-slate-200 text-slate-600 hover:border-slate-300"
                   }`}
                 >
                   <Filter className="w-4 h-4" />
                   <span className="hidden sm:inline">Filters</span>
+                  {activeFilterCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-maroon-700 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                      {activeFilterCount}
+                    </span>
+                  )}
                   <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
                 </button>
                 <button
@@ -385,21 +439,75 @@ export default function AdminDashboard() {
                     exit={{ height: 0, opacity: 0 }}
                     className="overflow-hidden"
                   >
-                    <div className="pt-2 pb-2 flex flex-wrap gap-2">
-                      <span className="text-sm text-slate-500 font-medium py-2">Gender:</span>
-                      {["all", "Male", "Female", "Other"].map((gender) => (
-                        <button
-                          key={gender}
-                          onClick={() => setGenderFilter(gender)}
-                          className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                            genderFilter === gender
-                              ? "bg-maroon-700 text-white"
-                              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                          }`}
+                    <div className="pt-3 pb-3 space-y-4">
+                      <div className="flex flex-wrap gap-2 items-center">
+                        <span className="text-sm text-slate-500 font-medium py-1">Gender:</span>
+                        {["all", "Male", "Female", "Other"].map((gender) => (
+                          <button
+                            key={gender}
+                            onClick={() => setGenderFilter(gender)}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                              genderFilter === gender
+                                ? "bg-maroon-700 text-white"
+                                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                            }`}
+                          >
+                            {gender === "all" ? "All" : gender}
+                          </button>
+                        ))}
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2 items-center">
+                        <span className="text-sm text-slate-500 font-medium py-1">University:</span>
+                        <select
+                          value={universityFilter}
+                          onChange={(e) => setUniversityFilter(e.target.value)}
+                          className="px-3 py-1.5 rounded-lg text-sm font-medium border border-slate-200 focus:outline-none focus:border-maroon-700 bg-white"
                         >
-                          {gender === "all" ? "All" : gender}
+                          <option value="all">All Universities</option>
+                          {universities.map((uni) => (
+                            <option key={uni} value={uni}>{uni}</option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2 items-center">
+                        <span className="text-sm text-slate-500 font-medium py-1">Blood Group:</span>
+                        <select
+                          value={bloodGroupFilter}
+                          onChange={(e) => setBloodGroupFilter(e.target.value)}
+                          className="px-3 py-1.5 rounded-lg text-sm font-medium border border-slate-200 focus:outline-none focus:border-maroon-700 bg-white"
+                        >
+                          <option value="all">All Blood Groups</option>
+                          {bloodGroups.map((bg) => (
+                            <option key={bg} value={bg}>{bg}</option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2 items-center">
+                        <span className="text-sm text-slate-500 font-medium py-1">Date:</span>
+                        <select
+                          value={dateFilter}
+                          onChange={(e) => setDateFilter(e.target.value)}
+                          className="px-3 py-1.5 rounded-lg text-sm font-medium border border-slate-200 focus:outline-none focus:border-maroon-700 bg-white"
+                        >
+                          <option value="all">All Time</option>
+                          <option value="today">Today</option>
+                          <option value="yesterday">Yesterday</option>
+                          <option value="week">Last 7 Days</option>
+                          <option value="month">Last 30 Days</option>
+                        </select>
+                      </div>
+                      
+                      {activeFilterCount > 0 && (
+                        <button
+                          onClick={clearAllFilters}
+                          className="text-sm text-maroon-700 font-medium hover:underline"
+                        >
+                          Clear all filters ({activeFilterCount} active)
                         </button>
-                      ))}
+                      )}
                     </div>
                   </motion.div>
                 )}

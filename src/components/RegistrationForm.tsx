@@ -113,15 +113,15 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
           className="relative"
         >
           <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 ml-1">
-            <span className="text-amber-500 mr-1">●</span> Full Name
+            <span className="text-maroon-600 mr-1">●</span> Full Name
           </label>
           <div className="relative">
-            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-l-2xl flex items-center justify-center">
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-maroon-600 to-maroon-800 rounded-l-2xl flex items-center justify-center">
               <User className="w-5 h-5 text-white" />
             </div>
             <input
               {...register("fullName")}
-              className="w-full pl-16 pr-4 py-4 bg-white border-2 border-slate-200 rounded-r-2xl outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all font-bold text-slate-800 placeholder:text-slate-300 shadow-sm"
+              className="w-full pl-16 pr-4 py-4 bg-white border-2 border-slate-200 rounded-r-2xl outline-none focus:border-maroon-500 focus:ring-4 focus:ring-maroon-500/10 transition-all font-bold text-slate-800 placeholder:text-slate-300 shadow-sm"
               placeholder="Enter your full name"
             />
           </div>
@@ -137,16 +137,16 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
           className="relative"
         >
           <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 ml-1">
-            <span className="text-amber-500 mr-1">●</span> Email Address
+            <span className="text-maroon-500 mr-1">●</span> Email Address
           </label>
           <div className="relative">
-            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-l-2xl flex items-center justify-center">
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-maroon-500 to-maroon-500 rounded-l-2xl flex items-center justify-center">
               <Mail className="w-5 h-5 text-white" />
             </div>
             <input
               {...register("email")}
               type="email"
-              className="w-full pl-16 pr-4 py-4 bg-white border-2 border-slate-200 rounded-r-2xl outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all font-bold text-slate-800 placeholder:text-slate-300 shadow-sm"
+              className="w-full pl-16 pr-4 py-4 bg-white border-2 border-slate-200 rounded-r-2xl outline-none focus:border-maroon-500 focus:ring-4 focus:ring-maroon-500/10 transition-all font-bold text-slate-800 placeholder:text-slate-300 shadow-sm"
               placeholder="your.email@university.edu"
             />
           </div>
@@ -162,15 +162,15 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
           className="relative"
         >
           <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 ml-1">
-            <span className="text-amber-500 mr-1">●</span> Phone Number
+            <span className="text-maroon-500 mr-1">●</span> Phone Number
           </label>
           <div className="relative">
-            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-l-2xl flex items-center justify-center">
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-maroon-500 to-maroon-500 rounded-l-2xl flex items-center justify-center">
               <Phone className="w-5 h-5 text-white" />
             </div>
             <input
               {...register("phone")}
-              className="w-full pl-16 pr-4 py-4 bg-white border-2 border-slate-200 rounded-r-2xl outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all font-bold text-slate-800 placeholder:text-slate-300 shadow-sm"
+              className="w-full pl-16 pr-4 py-4 bg-white border-2 border-slate-200 rounded-r-2xl outline-none focus:border-maroon-500 focus:ring-4 focus:ring-maroon-500/10 transition-all font-bold text-slate-800 placeholder:text-slate-300 shadow-sm"
               placeholder="+880 1XXXXXXXXX"
             />
           </div>
@@ -186,15 +186,15 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
           className="relative"
         >
           <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 ml-1">
-            <span className="text-amber-500 mr-1">●</span> Student ID
+            <span className="text-maroon-500 mr-1">●</span> Student ID
           </label>
           <div className="relative">
-            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-l-2xl flex items-center justify-center">
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-maroon-500 to-maroon-500 rounded-l-2xl flex items-center justify-center">
               <IdCard className="w-5 h-5 text-white" />
             </div>
             <input
               {...register("studentId")}
-              className="w-full pl-16 pr-4 py-4 bg-white border-2 border-slate-200 rounded-r-2xl outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all font-bold text-slate-800 placeholder:text-slate-300 shadow-sm"
+              className="w-full pl-16 pr-4 py-4 bg-white border-2 border-slate-200 rounded-r-2xl outline-none focus:border-maroon-500 focus:ring-4 focus:ring-maroon-500/10 transition-all font-bold text-slate-800 placeholder:text-slate-300 shadow-sm"
               placeholder="Your Student ID"
             />
           </div>
@@ -210,21 +210,21 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
           className="relative"
         >
           <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 ml-1">
-            <span className="text-amber-500 mr-1">●</span> University
+            <span className="text-maroon-500 mr-1">●</span> University
           </label>
           <div className="relative">
-            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-l-2xl flex items-center justify-center z-10">
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-maroon-500 to-maroon-500 rounded-l-2xl flex items-center justify-center z-10">
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
             <select
               {...register("university")}
-              className="w-full pl-16 pr-4 py-4 bg-white border-2 border-slate-200 rounded-r-2xl outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all font-bold text-slate-800 appearance-none cursor-pointer shadow-sm"
+              className="w-full pl-16 pr-4 py-4 bg-white border-2 border-slate-200 rounded-r-2xl outline-none focus:border-maroon-500 focus:ring-4 focus:ring-maroon-500/10 transition-all font-bold text-slate-800 appearance-none cursor-pointer shadow-sm"
             >
               <option value="">Select your university</option>
               {institutes.map(inst => <option key={inst} value={inst}>{inst}</option>)}
             </select>
             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-              <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+              <div className="w-2 h-2 bg-maroon-500 rounded-full"></div>
             </div>
           </div>
           {errors.university && (
@@ -239,21 +239,21 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
           className="relative"
         >
           <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 ml-1">
-            <span className="text-amber-500 mr-1">●</span> Gender
+            <span className="text-maroon-500 mr-1">●</span> Gender
           </label>
           <div className="relative">
-            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-l-2xl flex items-center justify-center z-10">
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-maroon-500 to-maroon-500 rounded-l-2xl flex items-center justify-center z-10">
               <UserCheck className="w-5 h-5 text-white" />
             </div>
             <select
               {...register("gender")}
-              className="w-full pl-16 pr-4 py-4 bg-white border-2 border-slate-200 rounded-r-2xl outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all font-bold text-slate-800 appearance-none cursor-pointer shadow-sm"
+              className="w-full pl-16 pr-4 py-4 bg-white border-2 border-slate-200 rounded-r-2xl outline-none focus:border-maroon-500 focus:ring-4 focus:ring-maroon-500/10 transition-all font-bold text-slate-800 appearance-none cursor-pointer shadow-sm"
             >
               <option value="">Select gender</option>
               {genders.map(g => <option key={g} value={g}>{g}</option>)}
             </select>
             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-              <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+              <div className="w-2 h-2 bg-maroon-500 rounded-full"></div>
             </div>
           </div>
           {errors.gender && (
@@ -268,21 +268,21 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
           className="relative md:col-span-2"
         >
           <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 ml-1">
-            <span className="text-amber-500 mr-1">●</span> Blood Group
+            <span className="text-maroon-500 mr-1">●</span> Blood Group
           </label>
           <div className="relative">
-            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-l-2xl flex items-center justify-center z-10">
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-maroon-500 to-maroon-500 rounded-l-2xl flex items-center justify-center z-10">
               <Droplets className="w-5 h-5 text-white" />
             </div>
             <select
               {...register("bloodGroup")}
-              className="w-full pl-16 pr-4 py-4 bg-white border-2 border-slate-200 rounded-r-2xl outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all font-bold text-slate-800 appearance-none cursor-pointer shadow-sm"
+              className="w-full pl-16 pr-4 py-4 bg-white border-2 border-slate-200 rounded-r-2xl outline-none focus:border-maroon-500 focus:ring-4 focus:ring-maroon-500/10 transition-all font-bold text-slate-800 appearance-none cursor-pointer shadow-sm"
             >
               <option value="">Select blood group</option>
               {bloodGroups.map(bg => <option key={bg} value={bg}>{bg}</option>)}
             </select>
             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-              <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+              <div className="w-2 h-2 bg-maroon-500 rounded-full"></div>
             </div>
           </div>
           {errors.bloodGroup && (
@@ -306,14 +306,14 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
             />
             <div className={`w-7 h-7 rounded-xl border-2 transition-all flex items-center justify-center ${
               acceptedTerms 
-                ? "bg-gradient-to-br from-amber-400 to-orange-500 border-amber-500 shadow-lg shadow-amber-500/20" 
-                : "bg-white border-slate-200 group-hover:border-amber-400"
+                ? "bg-gradient-to-br from-maroon-400 to-maroon-500 border-maroon-500 shadow-lg shadow-maroon-500/20" 
+                : "bg-white border-slate-200 group-hover:border-maroon-400"
             }`}>
               {acceptedTerms && <CheckSquare className="w-4 h-4 text-white" />}
             </div>
           </div>
           <span className="text-sm font-medium text-slate-500 leading-relaxed pt-0.5">
-            I confirm that all information provided is accurate and I agree to the <span className="text-amber-600 font-bold">terms and conditions</span>. I understand that my entry is subject to verification of my student credentials.
+            I confirm that all information provided is accurate and I agree to the <span className="text-maroon-600 font-bold">terms and conditions</span>. I understand that my entry is subject to verification of my student credentials.
           </span>
         </label>
         {errors.terms && (
@@ -330,7 +330,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
         transition={{ delay: 0.5 }}
         type="submit"
         disabled={isSubmitting}
-        className="w-full group relative overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 bg-[length:200%_100%] hover:bg-[100%_0] py-5 rounded-2xl text-white font-black text-lg shadow-2xl shadow-amber-500/25 hover:shadow-amber-500/40 transition-all duration-500 disabled:opacity-70 disabled:cursor-not-allowed"
+        className="w-full group relative overflow-hidden bg-gradient-to-r from-maroon-500 via-maroon-500 to-maroon-500 bg-[length:200%_100%] hover:bg-[100%_0] py-5 rounded-2xl text-white font-black text-lg shadow-2xl shadow-maroon-500/25 hover:shadow-maroon-500/40 transition-all duration-500 disabled:opacity-70 disabled:cursor-not-allowed"
       >
         <div className="relative flex items-center justify-center gap-3">
           {isSubmitting ? (

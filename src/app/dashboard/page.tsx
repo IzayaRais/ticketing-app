@@ -83,8 +83,8 @@ function DashboardContent() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
-            <div className="w-16 h-16 border-4 border-amber-100 border-t-amber-500 rounded-full animate-spin"></div>
-            <Sparkles className="w-6 h-6 text-amber-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+            <div className="w-16 h-16 border-4 border-maroon-100 border-t-maroon-500 rounded-full animate-spin"></div>
+            <Sparkles className="w-6 h-6 text-maroon-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
           </div>
           <p className="text-slate-500 font-medium">Loading your dashboard...</p>
         </div>
@@ -99,7 +99,7 @@ function DashboardContent() {
   return (
     <>
       {!session && !existingTicket ? (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-maroon-50/30">
           <div className="pt-28 pb-16 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
               <motion.div
@@ -107,12 +107,12 @@ function DashboardContent() {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center"
               >
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 rounded-full mb-6">
-                  <Sparkles className="w-4 h-4 text-amber-500" />
-                  <span className="text-xs font-bold text-amber-500 uppercase tracking-wider">Antorip 2026</span>
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-maroon-500/10 rounded-full mb-6">
+                  <Sparkles className="w-4 h-4 text-maroon-500" />
+                  <span className="text-xs font-bold text-maroon-500 uppercase tracking-wider">Antorip 2026</span>
                 </div>
                 <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
-                  Secure Your <span className="text-amber-500">Invite</span>
+                  Secure Your <span className="text-maroon-500">Invite</span>
                 </h1>
                 <p className="text-slate-300 font-medium text-lg max-w-2xl mx-auto">
                   Sign in with Google or verify your entry code to access the Antorip Farewell Concert registration portal.
@@ -131,21 +131,21 @@ function DashboardContent() {
               >
                 <div className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
+                    <div className="w-12 h-12 bg-gradient-to-br from-maroon-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-maroon-500/20">
                       <Calendar className="w-6 h-6 text-white" />
                     </div>
                     <div>
                       <h3 className="font-black text-slate-800">Event Details</h3>
-                      <p className="text-xs text-amber-600 font-bold uppercase tracking-wider">April 09, 2026</p>
+                      <p className="text-xs text-maroon-600 font-bold uppercase tracking-wider">April 09, 2026</p>
                     </div>
                   </div>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                      <MapPin className="w-5 h-5 text-amber-600" />
+                      <MapPin className="w-5 h-5 text-maroon-600" />
                       <span className="text-sm font-bold text-slate-700">MIST Central Field</span>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                      <Clock className="w-5 h-5 text-amber-600" />
+                      <Clock className="w-5 h-5 text-maroon-600" />
                       <span className="text-sm font-bold text-slate-700">Gate Opens: 6:00 PM</span>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
@@ -171,7 +171,7 @@ function DashboardContent() {
                       onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
                       className="w-full group relative overflow-hidden bg-gradient-to-r from-slate-800 to-slate-900 py-5 px-6 rounded-2xl text-white shadow-lg shadow-slate-800/20 hover:shadow-xl hover:shadow-slate-800/30 transition-all flex items-center justify-center gap-4 font-black"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                      <div className="absolute inset-0 bg-gradient-to-r from-maroon-500 to-orange-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
                       <svg className="w-6 h-6 relative z-10" viewBox="0 0 24 24">
                         <path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -189,7 +189,7 @@ function DashboardContent() {
                     
                     <Link 
                       href="/verify" 
-                      className="w-full group flex items-center justify-center gap-3 py-4 px-6 rounded-2xl border-2 border-slate-200 text-slate-700 font-bold hover:border-amber-500 hover:text-amber-600 transition-all"
+                      className="w-full group flex items-center justify-center gap-3 py-4 px-6 rounded-2xl border-2 border-slate-200 text-slate-700 font-bold hover:border-maroon-500 hover:text-maroon-600 transition-all"
                     >
                       <Ticket className="w-5 h-5 group-hover:scale-110 transition-transform" />
                       <span>Verify Entry Code</span>
@@ -202,7 +202,7 @@ function DashboardContent() {
           </div>
         </div>
       ) : (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-maroon-50/30">
           <div className="pt-28 pb-16 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
               <motion.div
@@ -231,9 +231,9 @@ function DashboardContent() {
                 {session?.user && (
                   <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-2xl">
                     {session.user.image ? (
-                      <img src={session.user.image} alt="User" className="w-10 h-10 rounded-full border-2 border-amber-500" />
+                      <img src={session.user.image} alt="User" className="w-10 h-10 rounded-full border-2 border-maroon-500" />
                     ) : (
-                      <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
+                      <div className="w-10 h-10 bg-gradient-to-br from-maroon-400 to-orange-500 rounded-full flex items-center justify-center">
                         <User className="w-5 h-5 text-white" />
                       </div>
                     )}
@@ -257,7 +257,7 @@ function DashboardContent() {
               >
                 <div className="bg-white rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-slate-100">
                   <div className="flex items-center gap-3 mb-5">
-                    <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center">
+                    <div className="w-10 h-10 bg-gradient-to-br from-maroon-400 to-orange-500 rounded-xl flex items-center justify-center">
                       <MapPin className="w-5 h-5 text-white" />
                     </div>
                     <div>
@@ -271,8 +271,12 @@ function DashboardContent() {
                       <span className="text-sm font-black text-green-600">{existingTicket ? "Verified" : "Pending"}</span>
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                      <span className="text-xs font-bold text-slate-400 uppercase">Pass Type</span>
-                      <span className="text-sm font-bold text-slate-700">Standard Student</span>
+                      <span className="text-xs font-bold text-slate-400 uppercase">Pass Level</span>
+                      <span className="text-sm font-bold text-slate-700">Student/On Going</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                      <span className="text-xs font-bold text-slate-400 uppercase">Venue</span>
+                      <span className="text-sm font-bold text-slate-700">MIST Central Field</span>
                     </div>
                     {existingTicket && (
                       <div className="flex justify-between items-center py-2">
@@ -292,10 +296,10 @@ function DashboardContent() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 + i * 0.1 }}
-                      className="flex items-start gap-4 p-4 bg-white border border-slate-100 rounded-2xl hover:shadow-lg hover:border-amber-100 transition-all"
+                      className="flex items-start gap-4 p-4 bg-white border border-slate-100 rounded-2xl hover:shadow-lg hover:border-maroon-100 transition-all"
                     >
-                      <div className="w-10 h-10 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <f.icon className="w-5 h-5 text-amber-600" />
+                      <div className="w-10 h-10 bg-gradient-to-br from-maroon-50 to-orange-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <f.icon className="w-5 h-5 text-maroon-600" />
                       </div>
                       <div>
                         <p className="text-sm font-bold text-slate-800">{f.title}</p>
@@ -317,7 +321,7 @@ function DashboardContent() {
                 ) : (
                   <div className="bg-white rounded-3xl p-8 md:p-10 shadow-xl shadow-slate-200/50 border border-slate-100">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center">
+                      <div className="w-10 h-10 bg-gradient-to-br from-maroon-400 to-orange-500 rounded-xl flex items-center justify-center">
                         <Info className="w-5 h-5 text-white" />
                       </div>
                       <div>
@@ -344,7 +348,7 @@ export default function Dashboard() {
       <Navbar />
       <Suspense fallback={
         <div className="flex items-center justify-center min-h-screen">
-          <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+          <Loader2 className="w-8 h-8 animate-spin text-maroon-500" />
         </div>
       }>
         <DashboardContent />

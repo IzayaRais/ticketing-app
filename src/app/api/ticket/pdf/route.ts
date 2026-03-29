@@ -27,7 +27,6 @@ export async function GET(request: Request) {
         studentId: ticketData.studentId || "",
         university: ticketData.university,
         gender: ticketData.gender || "Other",
-        tshirtSize: ticketData.tshirtSize,
         bloodGroup: ticketData.bloodGroup || "",
         terms: true,
       },

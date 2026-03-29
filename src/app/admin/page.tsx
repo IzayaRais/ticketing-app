@@ -6,7 +6,7 @@ import { signIn, signOut } from "next-auth/react";
 import { motion } from "framer-motion";
 import { 
   Users, UserCheck, UserX, Download, Search, 
-  ArrowUpDown, Loader2, Ticket, GraduationCap, Shirt, Droplets
+  ArrowUpDown, Loader2, Ticket, GraduationCap, Droplets
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 
@@ -21,7 +21,6 @@ interface Ticket {
   studentId: string;
   university: string;
   gender: string;
-  tshirtSize: string;
   bloodGroup: string;
   status: string;
   timestamp: string;
@@ -95,12 +94,12 @@ export default function AdminDashboard() {
     });
 
   const downloadCSV = () => {
-    const headers = ["Ticket ID", "Full Name", "Email", "Phone", "Student ID", "University", "Gender", "T-Shirt", "Blood Group", "Status", "Timestamp"];
+    const headers = ["Ticket ID", "Full Name", "Email", "Phone", "Student ID", "University", "Gender", "Blood Group", "Status", "Timestamp"];
     const csvContent = [
       headers.join(","),
       ...filteredTickets.map(t => [
         t.ticketId, t.fullName, t.email, t.phone, t.studentId, 
-        t.university, t.gender, t.tshirtSize, t.bloodGroup, t.status, t.timestamp
+        t.university, t.gender, t.bloodGroup, t.status, t.timestamp
       ].map(v => `"${v}"`).join(","))
     ].join("\n");
 
@@ -349,12 +348,7 @@ export default function AdminDashboard() {
                       <ArrowUpDown className="w-3 h-3" />
                     </button>
                   </th>
-                  <th className="px-6 py-4 text-left">
-                    <span className="flex items-center gap-1 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      <Shirt className="w-3 h-3" />
-                      T-Shirt
-                    </span>
-                  </th>
+
                   <th className="px-6 py-4 text-left">
                     <span className="flex items-center gap-1 text-xs font-bold text-slate-500 uppercase tracking-wider">
                       <Droplets className="w-3 h-3" />
@@ -375,7 +369,7 @@ export default function AdminDashboard() {
               <tbody className="divide-y divide-slate-100">
                 {filteredTickets.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center text-slate-400">
+                    <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
                       No registrations found
                     </td>
                   </tr>
@@ -411,9 +405,7 @@ export default function AdminDashboard() {
                           {ticket.gender}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="text-sm font-semibold text-slate-700">Size {ticket.tshirtSize}</span>
-                      </td>
+
                       <td className="px-6 py-4">
                         <span className="text-sm font-semibold text-red-600">{ticket.bloodGroup}</span>
                       </td>

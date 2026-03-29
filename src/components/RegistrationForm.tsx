@@ -3,16 +3,16 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registrationSchema, RegistrationData } from "@/lib/validations";
+import { registrationSchema, RegistrationData, institutes } from "@/lib/validations";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Loader2, AlertCircle, CheckCircle2,
-  User, Mail, Phone, GraduationCap, Shirt,
+  User, Mail, Phone, GraduationCap,
   IdCard, UserCheck, Droplets, CheckSquare
 } from "lucide-react";
 
-const tshirtSizes = ["S", "M", "L", "XL", "XXL"] as const;
+
 const bloodGroups = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"] as const;
 const genders = ["Male", "Female"] as const;
 
@@ -60,10 +60,8 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
     formState: { errors },
   } = useForm<RegistrationData>({
     resolver: zodResolver(registrationSchema),
-    defaultValues: { tshirtSize: "M", terms: false },
+    defaultValues: { terms: false },
   });
-
-  const selectedSize = watch("tshirtSize");
   const acceptedTerms = watch("terms");
 
   const onSubmit = async (data: RegistrationData) => {
@@ -144,12 +142,15 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
           />
         </FieldWrapper>
 
-        <FieldWrapper label="University (Short)" icon={<GraduationCap className="w-3.5 h-3.5" />} error={errors.university?.message}>
-          <input
+        <FieldWrapper label="Institute" icon={<GraduationCap className="w-3.5 h-3.5" />} error={errors.university?.message}>
+          <select
             {...register("university")}
-            className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-maroon-700 focus:ring-4 focus:ring-maroon-700/5 transition-all font-bold text-slate-800"
-            placeholder="e.g. MIST, BUET"
-          />
+            className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-maroon-700 focus:ring-4 focus:ring-maroon-700/5 transition-all font-bold text-slate-800 appearance-none bg-no-repeat bg-[right_1.5rem_center]"
+            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23800000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 15 5 5 5-5'/%3E%3Cpath d='m7 9 5-5 5-5'/%3E%3C/svg%3E")` }}
+          >
+            <option value="">Select Institute</option>
+            {institutes.map(inst => <option key={inst} value={inst}>{inst}</option>)}
+          </select>
         </FieldWrapper>
 
         <FieldWrapper label="Gender" icon={<UserCheck className="w-3.5 h-3.5" />} error={errors.gender?.message}>
@@ -174,29 +175,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
           </select>
         </FieldWrapper>
 
-         <FieldWrapper label="T-Shirt Selection" icon={<Shirt className="w-3.5 h-3.5" />} error={errors.tshirtSize?.message}>
-          <div className="flex gap-2.5">
-            {tshirtSizes.map((size) => (
-              <label key={size} className="flex-1 cursor-pointer">
-                <input
-                  type="radio"
-                  value={size}
-                  {...register("tshirtSize")}
-                  className="peer sr-only"
-                />
-                <div
-                  className={`text-center py-4 rounded-2xl border-2 font-black text-[10px] transition-all duration-200 ${
-                    selectedSize === size
-                      ? "border-maroon-700 bg-maroon-700 text-white shadow-xl shadow-maroon-700/20"
-                      : "border-slate-100 bg-slate-50 text-slate-400 hover:border-maroon-700/20 hover:text-maroon-700"
-                  }`}
-                >
-                  {size}
-                </div>
-              </label>
-            ))}
-          </div>
-        </FieldWrapper>
+
       </div>
 
       <div className="pt-6 space-y-6">

@@ -55,7 +55,7 @@ async function ensureHeaders(sheet: any) {
     if (!headers.includes("gender")) {
        await sheet.setHeaderRow([
         "timestamp", "ticketId", "fullName", "email",
-        "phone", "studentId", "university", "gender", "tshirtSize", "bloodGroup", "status"
+        "phone", "studentId", "university", "gender", "bloodGroup", "status"
       ]);
     }
   } catch (e) {
@@ -81,7 +81,6 @@ export async function appendToSheet(data: RegistrationData & { ticketId: string 
       studentId: data.studentId,
       university: data.university,
       gender: data.gender,
-      tshirtSize: data.tshirtSize,
       bloodGroup: data.bloodGroup,
       status: "Verified",
     });
@@ -110,7 +109,6 @@ export async function getTicketById(ticketId: string) {
       studentId: row.get("studentId"),
       university: row.get("university"),
       gender: row.get("gender"),
-      tshirtSize: row.get("tshirtSize"),
       bloodGroup: row.get("bloodGroup"),
       status: row.get("status"),
       timestamp: row.get("timestamp"),
@@ -138,7 +136,6 @@ export async function getTicketByEmail(email: string) {
       studentId: row.get("studentId"),
       university: row.get("university"),
       gender: row.get("gender"),
-      tshirtSize: row.get("tshirtSize"),
       bloodGroup: row.get("bloodGroup"),
       status: row.get("status"),
       timestamp: row.get("timestamp"),
@@ -163,7 +160,6 @@ export async function getAllTickets() {
       studentId: r.get("studentId"),
       university: r.get("university"),
       gender: r.get("gender"),
-      tshirtSize: r.get("tshirtSize"),
       bloodGroup: r.get("bloodGroup"),
       status: r.get("status"),
       timestamp: r.get("timestamp"),

@@ -10,15 +10,12 @@ export async function GET() {
     const otherCount = tickets.filter((t: any) => t.gender === "Other").length;
 
     const universityStats: Record<string, number> = {};
-    const tshirtStats: Record<string, number> = {};
+
     const bloodGroupStats: Record<string, number> = {};
 
     tickets.forEach((t: any) => {
       if (t.university) {
         universityStats[t.university] = (universityStats[t.university] || 0) + 1;
-      }
-      if (t.tshirtSize) {
-        tshirtStats[t.tshirtSize] = (tshirtStats[t.tshirtSize] || 0) + 1;
       }
       if (t.bloodGroup) {
         bloodGroupStats[t.bloodGroup] = (bloodGroupStats[t.bloodGroup] || 0) + 1;
@@ -33,7 +30,6 @@ export async function GET() {
       tickets: tickets.reverse(),
       stats: {
         byUniversity: universityStats,
-        byTshirt: tshirtStats,
         byBloodGroup: bloodGroupStats,
       },
     });

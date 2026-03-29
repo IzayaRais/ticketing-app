@@ -33,7 +33,6 @@ export async function GET(
         studentId: ticket.studentId || "",
         university: ticket.university,
         gender: ticket.gender || "Other",
-        tshirtSize: ticket.tshirtSize,
         bloodGroup: ticket.bloodGroup || "",
         terms: true,
       },

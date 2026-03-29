@@ -184,7 +184,6 @@ const TicketDocument = ({ data, ticketId }: { data: RegistrationData; ticketId: 
               { label: "Institutional Identity", value: data.university },
               { label: "Student Credential", value: data.studentId },
               { label: "Gender / Identity", value: data.gender },
-              { label: "T-Shirt Allocation", value: `Size ${data.tshirtSize}` },
               { label: "Medical Info", value: `Blood Group: ${data.bloodGroup}` },
               { label: "Contact Reference", value: data.phone },
               { label: "Digital Registry", value: data.email },

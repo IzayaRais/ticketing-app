@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Download, Ticket, User, Mail, Phone, GraduationCap, Shirt, CheckCircle, IdCard, Heart, UserCheck, Droplets, MapPin, Calendar } from "lucide-react";
+import { Download, Ticket, User, Mail, Phone, GraduationCap, CheckCircle, IdCard, Heart, UserCheck, Droplets, MapPin, Calendar } from "lucide-react";
 
 interface TicketData {
   ticketId: string;
@@ -12,7 +12,6 @@ interface TicketData {
   studentId?: string;
   university: string;
   gender?: string;
-  tshirtSize: string;
   bloodGroup?: string;
   status: string;
 }
@@ -24,7 +23,6 @@ export default function TicketCard({ ticket, onDownload }: { ticket: TicketData;
     { label: "Student ID", value: ticket.studentId || "N/A", icon: <IdCard className="w-4 h-4" /> },
     { label: "Gender", value: ticket.gender || "Not Set", icon: <UserCheck className="w-4 h-4" /> },
     { label: "Blood Group", value: ticket.bloodGroup || "N/A", icon: <Droplets className="w-4 h-4" /> },
-    { label: "T-Shirt Size", value: ticket.tshirtSize, icon: <Shirt className="w-4 h-4" /> },
     { label: "Contact No", value: ticket.phone, icon: <Phone className="w-4 h-4" /> },
     { label: "Email Address", value: ticket.email, icon: <Mail className="w-4 h-4" /> },
   ];

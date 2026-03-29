@@ -50,7 +50,6 @@ export async function GET(request: Request) {
       studentId: row.get("studentId"),
       university: row.get("university"),
       gender: row.get("gender"),
-      tshirtSize: row.get("tshirtSize"),
       bloodGroup: row.get("bloodGroup"),
       status: row.get("status"),
       timestamp: row.get("timestamp"),

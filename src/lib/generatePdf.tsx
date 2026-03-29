@@ -1,222 +1,426 @@
 import React from "react";
-import { Document, Page, Text, View, StyleSheet, renderToBuffer } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, renderToBuffer, Font } from "@react-pdf/renderer";
 import { RegistrationData } from "./validations";
 
 const styles = StyleSheet.create({
   page: {
     padding: 0,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#FAFAFA",
     fontFamily: "Helvetica",
   },
   container: {
-    margin: 40,
-    border: "1pt solid #E5E7EB",
-    height: "90%",
+    flex: 1,
     position: "relative",
   },
-  accentBar: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: 8,
-    height: "100%",
-    backgroundColor: "#800000",
+  topSection: {
+    backgroundColor: "#1A1A2E",
+    padding: "40 50 35 50",
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
   },
   header: {
-    padding: "50 50 20 50",
-    display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-end",
+    alignItems: "flex-start",
   },
   headerLeft: {
     flex: 1,
   },
   headerRight: {
-    textAlign: "right",
+    alignItems: "flex-end",
+  },
+  eventTag: {
+    fontSize: 7,
+    color: "#E94560",
+    letterSpacing: 3,
+    textTransform: "uppercase",
+    fontWeight: "bold",
+    marginBottom: 4,
   },
   title: {
-    fontSize: 32,
-    fontWeight: "black",
-    color: "#111827",
-    letterSpacing: -1,
-    marginBottom: 5,
-    textTransform: "uppercase",
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    letterSpacing: -0.5,
+    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 10,
-    color: "#800000",
-    letterSpacing: 4,
-    textTransform: "uppercase",
-    fontWeight: "bold",
+    fontSize: 11,
+    color: "#A0AEC0",
+    fontWeight: "medium",
   },
-  venueDate: {
+  dateBox: {
+    backgroundColor: "#E94560",
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 6,
+    marginBottom: 8,
+  },
+  dateText: {
     fontSize: 9,
-    color: "#6B7280",
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    letterSpacing: 1,
     textTransform: "uppercase",
-    letterSpacing: 1.5,
+  },
+  venueText: {
+    fontSize: 9,
+    color: "#A0AEC0",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  ticketIdSection: {
+    backgroundColor: "#FFFFFF",
+    marginHorizontal: 30,
+    marginTop: -25,
+    borderRadius: 16,
+    padding: 25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  ticketIdHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  ticketLabel: {
+    fontSize: 7,
+    color: "#718096",
+    textTransform: "uppercase",
+    letterSpacing: 2,
     fontWeight: "bold",
   },
-  content: {
-    padding: "0 50",
-    marginTop: 40,
+  verifiedBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
   },
-  idBox: {
-    backgroundColor: "#F9FAFB",
-    padding: 30,
-    borderRadius: 12,
-    border: "0.5pt solid #E5E7EB",
-    marginBottom: 50,
+  verifiedDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#48BB78",
   },
-  idLabel: {
-    fontSize: 8,
-    color: "#9CA3AF",
+  verifiedText: {
+    fontSize: 7,
+    color: "#48BB78",
+    fontWeight: "bold",
     textTransform: "uppercase",
-    letterSpacing: 3,
-    marginBottom: 10,
+    letterSpacing: 1,
+  },
+  ticketIdValue: {
+    fontSize: 36,
+    fontWeight: "bold",
+    color: "#E94560",
+    letterSpacing: 6,
     textAlign: "center",
   },
-  idValue: {
-    fontSize: 48,
-    color: "#800000",
-    fontWeight: "black",
-    textAlign: "center",
-    letterSpacing: 10,
+  divider: {
+    height: 1,
+    backgroundColor: "#E2E8F0",
+    marginVertical: 20,
   },
-  grid: {
-    display: "flex",
+  infoSection: {
+    padding: "20 50",
+  },
+  sectionTitle: {
+    fontSize: 9,
+    color: "#A0AEC0",
+    textTransform: "uppercase",
+    letterSpacing: 2,
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
+  infoGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    borderTop: "0.5pt solid #F3F4F6",
-    paddingTop: 30,
   },
-  gridItem: {
-    width: "50%",
-    marginBottom: 30,
+  infoCard: {
+    width: "33.33%",
+    marginBottom: 20,
   },
-  label: {
-    fontSize: 8,
-    color: "#9CA3AF",
+  infoLabel: {
+    fontSize: 7,
+    color: "#718096",
     textTransform: "uppercase",
     letterSpacing: 1.5,
-    marginBottom: 5,
+    marginBottom: 4,
     fontWeight: "bold",
   },
-  value: {
+  infoValue: {
     fontSize: 12,
-    color: "#111827",
+    color: "#1A1A2E",
     fontWeight: "bold",
     textTransform: "uppercase",
+  },
+  infoValueSmall: {
+    fontSize: 10,
+    color: "#4A5568",
+    fontWeight: "medium",
+  },
+  genderBadge: {
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    alignSelf: "flex-start",
+    marginTop: 2,
+  },
+  genderMale: {
+    backgroundColor: "#EBF8FF",
+  },
+  genderFemale: {
+    backgroundColor: "#FFF5F5",
+  },
+  genderOther: {
+    backgroundColor: "#FAF5FF",
+  },
+  genderText: {
+    fontSize: 8,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+  },
+  genderTextMale: {
+    color: "#3182CE",
+  },
+  genderTextFemale: {
+    color: "#E53E3E",
+  },
+  genderTextOther: {
+    color: "#805AD5",
   },
   footer: {
     position: "absolute",
-    bottom: 50,
-    left: 50,
-    right: 50,
-    borderTop: "1pt solid #E5E7EB",
-    paddingTop: 30,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#1A1A2E",
+    padding: "20 50",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
-  footerTop: {
-    display: "flex",
+  footerContent: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 15,
-  },
-  instruction: {
-    fontSize: 8,
-    color: "#6B7280",
-    lineHeight: 1.6,
-    maxWidth: "70%",
-  },
-  seal: {
-    width: 60,
-    height: 60,
-    border: "1.5pt solid #800000",
-    borderRadius: 30,
-    display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    opacity: 0.15,
   },
-  sealText: {
-    fontSize: 7,
-    color: "#800000",
-    fontWeight: "black",
-    textAlign: "center",
+  footerLeft: {
+    flex: 1,
+  },
+  instructionTitle: {
+    fontSize: 8,
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    marginBottom: 6,
     textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  instructionText: {
+    fontSize: 7,
+    color: "#A0AEC0",
+    lineHeight: 1.8,
+  },
+  footerRight: {
+    alignItems: "center",
+    marginLeft: 30,
+  },
+  qrPlaceholder: {
+    width: 50,
+    height: 50,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 4,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  qrText: {
+    fontSize: 6,
+    color: "#718096",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  logoSection: {
+    alignItems: "center",
+  },
+  logoText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#E94560",
+    marginBottom: 2,
+  },
+  logoSubtext: {
+    fontSize: 6,
+    color: "#718096",
+    textTransform: "uppercase",
+    letterSpacing: 2,
+  },
+  bottomBarcode: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 15,
+    backgroundColor: "#F7FAFC",
+  },
+  barcodeLine: {
+    height: 30,
+    width: 2,
+    backgroundColor: "#1A1A2E",
+    marginHorizontal: 2,
   },
   copyright: {
     fontSize: 7,
-    color: "#9CA3AF",
+    color: "#718096",
     textAlign: "center",
-    marginTop: 20,
-    textTransform: "uppercase",
-    letterSpacing: 2,
-  }
+    marginTop: 12,
+  },
+  decorativeCircle: {
+    position: "absolute",
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: "#E94560",
+    opacity: 0.03,
+    top: -50,
+    right: -50,
+  },
+  decorativeCircle2: {
+    position: "absolute",
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "#1A1A2E",
+    opacity: 0.05,
+    bottom: 100,
+    left: -30,
+  },
 });
 
-const TicketDocument = ({ data, ticketId }: { data: RegistrationData; ticketId: string }) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.container}>
-        <View style={styles.accentBar} />
-        
-        <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <Text style={styles.subtitle}>Antorip 2026 Presents</Text>
-            <Text style={styles.title}>The Farewell</Text>
-          </View>
-          <View style={styles.headerRight}>
-            <Text style={styles.venueDate}>April 09 // 2026</Text>
-            <Text style={styles.venueDate}>MIST Central Field</Text>
-          </View>
-        </View>
+const TicketDocument = ({ data, ticketId }: { data: RegistrationData; ticketId: string }) => {
+  const getGenderStyle = (gender: string) => {
+    switch (gender) {
+      case "Male":
+        return { badge: styles.genderMale, text: styles.genderTextMale };
+      case "Female":
+        return { badge: styles.genderFemale, text: styles.genderTextFemale };
+      default:
+        return { badge: styles.genderOther, text: styles.genderTextOther };
+    }
+  };
+  
+  const genderStyle = getGenderStyle(data.gender);
 
-        <View style={styles.content}>
-          <View style={styles.idBox}>
-            <Text style={styles.idLabel}>Gate Authentication Pass</Text>
-            <Text style={styles.idValue}>{ticketId}</Text>
-          </View>
-
-          <View style={styles.grid}>
-            {[
-              { label: "Attendee", value: data.fullName },
-              { label: "Institutional Identity", value: data.university },
-              { label: "Student Credential", value: data.studentId },
-              { label: "Gender / Identity", value: data.gender },
-              { label: "Medical Info", value: `Blood Group: ${data.bloodGroup}` },
-              { label: "Contact Reference", value: data.phone },
-              { label: "Digital Registry", value: data.email },
-            ].map((item, i) => (
-              <View key={i} style={styles.gridItem}>
-                <Text style={styles.label}>{item.label}</Text>
-                <Text style={styles.value}>{item.value}</Text>
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.container}>
+          <View style={styles.decorativeCircle} />
+          <View style={styles.decorativeCircle2} />
+          
+          <View style={styles.topSection}>
+            <View style={styles.header}>
+              <View style={styles.headerLeft}>
+                <Text style={styles.eventTag}>Antorip 2026 Presents</Text>
+                <Text style={styles.title}>The Farewell</Text>
+                <Text style={styles.subtitle}>A Memorable Musical Experience</Text>
               </View>
-            ))}
+              <View style={styles.headerRight}>
+                <View style={styles.dateBox}>
+                  <Text style={styles.dateText}>April 09, 2026</Text>
+                </View>
+                <Text style={styles.venueText}>MIST Central Field</Text>
+                <Text style={styles.venueText}>Dhaka, Bangladesh</Text>
+              </View>
+            </View>
           </View>
-        </View>
 
-        <View style={styles.footer}>
-          <View style={styles.footerTop}>
-            <View style={styles.instruction}>
-              <Text style={{ fontWeight: "bold", color: "#111827", marginBottom: 5, fontSize: 9 }}>Official Admission Protocol</Text>
-              <Text>• Original institutional ID card is mandatory for venue ingress.</Text>
-              <Text>• This digital pass is unique and non-transferable.</Text>
-              <Text>• Unauthorized duplication is strictly prohibited and traceable.</Text>
-              <Text>• Gate opens precisely at 18:00 HRS. Late arrivals may be restricted.</Text>
+          <View style={styles.ticketIdSection}>
+            <View style={styles.ticketIdHeader}>
+              <Text style={styles.ticketLabel}>Gate Authentication Pass</Text>
+              <View style={styles.verifiedBadge}>
+                <View style={styles.verifiedDot} />
+                <Text style={styles.verifiedText}>Verified</Text>
+              </View>
             </View>
-            <View style={styles.seal}>
-               <Text style={styles.sealText}>Verified</Text>
-               <Text style={styles.sealText}>Antorip</Text>
-               <Text style={styles.sealText}>2026</Text>
+            <Text style={styles.ticketIdValue}>{ticketId}</Text>
+            <View style={styles.divider} />
+          </View>
+
+          <View style={styles.infoSection}>
+            <Text style={styles.sectionTitle}>Attendee Information</Text>
+            <View style={styles.infoGrid}>
+              <View style={styles.infoCard}>
+                <Text style={styles.infoLabel}>Full Name</Text>
+                <Text style={styles.infoValue}>{data.fullName}</Text>
+              </View>
+              <View style={styles.infoCard}>
+                <Text style={styles.infoLabel}>Email Address</Text>
+                <Text style={styles.infoValueSmall}>{data.email}</Text>
+              </View>
+              <View style={styles.infoCard}>
+                <Text style={styles.infoLabel}>Phone Number</Text>
+                <Text style={styles.infoValueSmall}>{data.phone}</Text>
+              </View>
+              <View style={styles.infoCard}>
+                <Text style={styles.infoLabel}>University / Institution</Text>
+                <Text style={styles.infoValue}>{data.university}</Text>
+              </View>
+              <View style={styles.infoCard}>
+                <Text style={styles.infoLabel}>Student ID</Text>
+                <Text style={styles.infoValue}>{data.studentId}</Text>
+              </View>
+              <View style={styles.infoCard}>
+                <Text style={styles.infoLabel}>Gender</Text>
+                <View style={[styles.genderBadge, genderStyle.badge]}>
+                  <Text style={[styles.genderText, genderStyle.text]}>{data.gender}</Text>
+                </View>
+              </View>
+              <View style={styles.infoCard}>
+                <Text style={styles.infoLabel}>Blood Group</Text>
+                <Text style={styles.infoValue}>{data.bloodGroup}</Text>
+              </View>
+              <View style={styles.infoCard}>
+                <Text style={styles.infoLabel}>Registration Date</Text>
+                <Text style={styles.infoValueSmall}>N/A</Text>
+              </View>
+              <View style={styles.infoCard}>
+                <Text style={styles.infoLabel}>Status</Text>
+                <Text style={[styles.infoValue, { color: "#48BB78" }]}>Confirmed</Text>
+              </View>
             </View>
           </View>
-          <Text style={styles.copyright}>MIST Central Field, Mirpur Cantonment, Dhaka · 2026</Text>
+
+          <View style={styles.footer}>
+            <View style={styles.footerContent}>
+              <View style={styles.footerLeft}>
+                <Text style={styles.instructionTitle}>Entry Requirements</Text>
+                <Text style={styles.instructionText}>
+                  • Present original student ID card at the entrance{'\n'}
+                  • This pass is non-transferable and tied to your identity{'\n'}
+                  • Gate opens at 6:00 PM - please arrive early{'\n'}
+                  • No outside food or beverages allowed{'\n'}
+                  • Follow venue staff instructions at all times
+                </Text>
+              </View>
+              <View style={styles.footerRight}>
+                <View style={styles.qrPlaceholder}>
+                  <Text style={styles.qrText}>QR Code</Text>
+                </View>
+              </View>
+            </View>
+            <View style={styles.bottomBarcode}>
+              <Text style={styles.copyright}>
+                MIST Central Field, Mirpur Cantonment, Dhaka • 2026 • Antorip Farewell Concert
+              </Text>
+            </View>
+          </View>
         </View>
-      </View>
-    </Page>
-  </Document>
-);
+      </Page>
+    </Document>
+  );
+};
 
 export async function generateTicketPdf(data: RegistrationData, ticketId: string) {
   try {

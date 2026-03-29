@@ -16,7 +16,7 @@ export default function LandingPage() {
   const [showReg, setShowReg] = useState(false);
 
   const stats = [
-    { label: "Attendees", value: "500+", icon: <Users className="w-4 h-4" /> },
+    { label: "Attendees", value: "4500+", icon: <Users className="w-4 h-4" /> },
     { label: "Performance", value: "4 Hours", icon: <Music className="w-4 h-4" /> },
     { label: "Experience", value: "Central Base", icon: <Star className="w-4 h-4" /> },
   ];
@@ -286,6 +286,9 @@ export default function LandingPage() {
               </div>
               <p className="text-[11px] font-black tracking-[0.5em] uppercase text-slate-400 mb-4">Official Product of Antorip Class &apos;26</p>
               <p className="text-sm font-black text-slate-900 uppercase">MIST Central Field, Mirpur Cantonment, Dhaka · 2016</p>
+              <p className="text-xs font-black tracking-[0.3em] uppercase text-maroon-700 mt-6">
+                Developed by <a href="https://raisul-islam-ratul.vercel.app" target="_blank" rel="noopener noreferrer" className="hover:underline">Raisul Islam Ratul</a>
+              </p>
           </div>
       </footer>
     </main>

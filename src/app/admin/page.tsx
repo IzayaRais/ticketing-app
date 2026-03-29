@@ -3,10 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { signIn, signOut } from "next-auth/react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Users, UserCheck, UserX, Download, Search, 
-  ArrowUpDown, Loader2, Ticket, GraduationCap, Droplets
+  ArrowUpDown, Loader2, Ticket, GraduationCap, Droplets,
+  Menu, X, ChevronDown, Shield, LogOut, Bell, Settings,
+  TrendingUp, Calendar, Mail, Phone, Filter, RefreshCw
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 
@@ -26,6 +28,14 @@ interface Ticket {
   timestamp: string;
 }
 
+interface StatCard {
+  label: string;
+  value: number;
+  icon: React.ReactNode;
+  color: string;
+  bgColor: string;
+}
+
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -35,6 +45,8 @@ export default function AdminDashboard() {
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [genderFilter, setGenderFilter] = useState<string>("all");
   const [stats, setStats] = useState<any>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -111,12 +123,55 @@ export default function AdminDashboard() {
     a.click();
   };
 
+  const statCards: StatCard[] = [
+    { 
+      label: "Total Registrations", 
+      value: stats?.total || 0, 
+      icon: <Ticket className="w-6 h-6" />, 
+      color: "text-maroon-700",
+      bgColor: "bg-maroon-700/10"
+    },
+    { 
+      label: "Male", 
+      value: stats?.male || 0, 
+      icon: <UserCheck className="w-6 h-6" />, 
+      color: "text-blue-600",
+      bgColor: "bg-blue-50"
+    },
+    { 
+      label: "Female", 
+      value: stats?.female || 0, 
+      icon: <UserX className="w-6 h-6" />, 
+      color: "text-pink-600",
+      bgColor: "bg-pink-50"
+    },
+    { 
+      label: "Other", 
+      value: stats?.other || 0, 
+      icon: <Users className="w-6 h-6" />, 
+      color: "text-purple-600",
+      bgColor: "bg-purple-50"
+    },
+  ];
+
+  const SortIcon = ({ field }: { field: SortField }) => (
+    <span className={`inline-flex items-center ml-1 ${sortField === field ? 'text-maroon-700' : 'text-slate-300'}`}>
+      <ArrowUpDown className="w-3 h-3" />
+    </span>
+  );
+
   if (status === "loading" || loading) {
     return (
-      <main className="min-h-screen bg-offwhite">
+      <main className="min-h-screen bg-slate-50">
         <Navbar />
         <div className="pt-20 flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-maroon-700" />
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative">
+              <div className="w-16 h-16 border-4 border-maroon-100 border-t-maroon-700 rounded-full animate-spin"></div>
+              <Shield className="w-6 h-6 text-maroon-700 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+            </div>
+            <p className="text-slate-500 font-medium">Loading dashboard...</p>
+          </div>
         </div>
       </main>
     );
@@ -124,19 +179,27 @@ export default function AdminDashboard() {
 
   if (status === "unauthenticated") {
     return (
-      <main className="min-h-screen bg-offwhite">
+      <main className="min-h-screen bg-slate-50">
         <Navbar />
-        <div className="pt-20 flex items-center justify-center min-h-[60vh]">
-          <div className="card-premium p-10 text-center max-w-md">
-            <h2 className="text-2xl font-black text-maroon-950 mb-4">Admin Access</h2>
-            <p className="text-slate-400 mb-6">Please sign in to access the admin dashboard.</p>
+        <div className="pt-20 flex items-center justify-center min-h-[60vh] px-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-3xl shadow-xl border border-slate-100 p-10 text-center max-w-md w-full"
+          >
+            <div className="w-20 h-20 bg-gradient-to-br from-maroon-600 to-maroon-800 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-maroon-700/30">
+              <Shield className="w-10 h-10 text-white" />
+            </div>
+            <h2 className="text-2xl font-black text-slate-800 mb-2">Admin Access</h2>
+            <p className="text-slate-400 mb-8">Sign in to manage event registrations</p>
             <button
               onClick={() => signIn("google", { callbackUrl: "/admin" })}
-              className="btn-primary px-8 py-3 rounded-xl"
+              className="w-full py-4 px-6 bg-gradient-to-r from-maroon-700 to-maroon-800 text-white rounded-xl font-bold hover:from-maroon-800 hover:to-maroon-900 transition-all shadow-lg shadow-maroon-700/30 flex items-center justify-center gap-3"
             >
-              Sign In with Google
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'/%3E%3Cpath fill='%2334A853' d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z'/%3E%3Cpath fill='%23FBBC05' d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z'/%3E%3Cpath fill='%23EA4335' d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z'/%3E%3C/svg%3E" className="w-5 h-5" alt="Google" />
+              Continue with Google
             </button>
-          </div>
+          </motion.div>
         </div>
       </main>
     );
@@ -144,19 +207,38 @@ export default function AdminDashboard() {
 
   if (status === "authenticated" && (session?.user as any)?.role !== "admin") {
     return (
-      <main className="min-h-screen bg-offwhite">
+      <main className="min-h-screen bg-slate-50">
         <Navbar />
-        <div className="pt-20 flex items-center justify-center min-h-[60vh]">
-          <div className="card-premium p-10 text-center max-w-md">
-            <h2 className="text-2xl font-black text-maroon-950 mb-4">Access Denied</h2>
-            <p className="text-slate-400 mb-6">You do not have permission to access the admin dashboard.</p>
-            <button
-              onClick={() => signOut()}
-              className="btn-primary px-8 py-3 rounded-xl"
-            >
-              Sign Out
-            </button>
-          </div>
+        <div className="pt-20 flex items-center justify-center min-h-[60vh] px-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-3xl shadow-xl border border-red-100 p-10 text-center max-w-md w-full"
+          >
+            <div className="w-20 h-20 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Shield className="w-10 h-10 text-red-500" />
+            </div>
+            <h2 className="text-2xl font-black text-slate-800 mb-2">Access Denied</h2>
+            <p className="text-slate-500 mb-2 font-medium">
+              {session?.user?.email}
+            </p>
+            <p className="text-slate-400 mb-8">You don't have permission to access this area</p>
+            <div className="flex gap-3 justify-center">
+              <a 
+                href="/" 
+                className="px-6 py-3 rounded-xl font-bold border-2 border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50 transition-all"
+              >
+                Go Home
+              </a>
+              <button
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="px-6 py-3 rounded-xl font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-all flex items-center gap-2"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </button>
+            </div>
+          </motion.div>
         </div>
       </main>
     );
@@ -166,202 +248,218 @@ export default function AdminDashboard() {
     <main className="min-h-screen bg-slate-50">
       <Navbar />
 
-      <div className="pt-24 pb-12 bg-gradient-to-br from-maroon-900 via-maroon-800 to-maroon-900">
+      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 pt-28 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-white"
+            className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
           >
-            <h1 className="text-3xl md:text-4xl font-black mb-2">Admin Dashboard</h1>
-            <p className="text-maroon-200 font-medium">Manage and monitor event registrations</p>
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-3 h-3 rounded-full bg-green-400 animate-pulse"></div>
+                <span className="text-green-400 text-sm font-medium">Live</span>
+              </div>
+              <h1 className="text-3xl md:text-4xl font-black text-white">Admin Dashboard</h1>
+              <p className="text-slate-400 font-medium mt-1">Manage and monitor event registrations</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2 flex items-center gap-3">
+                <img 
+                  src={session?.user?.image || `https://ui-avatars.com/api/?name=Admin&background=maroon-700&color=fff`} 
+                  alt="Admin" 
+                  className="w-8 h-8 rounded-full"
+                />
+                <div className="hidden sm:block">
+                  <p className="text-white text-sm font-bold">{session?.user?.name}</p>
+                  <p className="text-slate-400 text-xs">Administrator</p>
+                </div>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Registrations</p>
-                <p className="text-3xl font-black text-maroon-900 mt-1">{stats?.total || 0}</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
+          {statCards.map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-white rounded-2xl p-4 md:p-5 shadow-lg border border-slate-100 hover:shadow-xl transition-shadow"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{stat.label}</p>
+                  <p className="text-2xl md:text-3xl font-black text-slate-800 mt-1">{stat.value.toLocaleString()}</p>
+                </div>
+                <div className={`w-10 h-10 md:w-12 md:h-12 ${stat.bgColor} rounded-xl flex items-center justify-center ${stat.color}`}>
+                  {stat.icon}
+                </div>
               </div>
-              <div className="w-12 h-12 bg-maroon-700/10 rounded-xl flex items-center justify-center">
-                <Ticket className="w-6 h-6 text-maroon-700" />
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Male</p>
-                <p className="text-3xl font-black text-blue-600 mt-1">{stats?.male || 0}</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                <UserCheck className="w-6 h-6 text-blue-600" />
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Female</p>
-                <p className="text-3xl font-black text-pink-600 mt-1">{stats?.female || 0}</p>
-              </div>
-              <div className="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center">
-                <UserX className="w-6 h-6 text-pink-600" />
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Other</p>
-                <p className="text-3xl font-black text-purple-600 mt-1">{stats?.other || 0}</p>
-              </div>
-              <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                <Users className="w-6 h-6 text-purple-600" />
-              </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          ))}
         </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 mb-8"
+          transition={{ delay: 0.4 }}
+          className="bg-white rounded-2xl p-4 md:p-6 shadow-lg border border-slate-100 mb-6"
         >
-          <h3 className="font-black text-maroon-900 mb-4 flex items-center gap-2">
-            <GraduationCap className="w-5 h-5" />
-            Registrations by University
-          </h3>
-          <div className="flex flex-wrap gap-3">
-            {Object.entries(stats?.stats?.byUniversity || {}).map(([uni, count]: [string, any]) => (
-              <div key={uni} className="px-4 py-2 bg-slate-100 rounded-xl flex items-center gap-2">
-                <span className="font-bold text-maroon-900">{uni}</span>
-                <span className="text-slate-500 text-sm">({count})</span>
-              </div>
-            ))}
+          <div className="flex items-center gap-2 mb-4">
+            <GraduationCap className="w-5 h-5 text-maroon-700" />
+            <h3 className="font-black text-slate-800">Registrations by University</h3>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(stats?.stats?.byUniversity || {}).length === 0 ? (
+              <p className="text-slate-400 text-sm">No university data available</p>
+            ) : (
+              Object.entries(stats?.stats?.byUniversity || {}).map(([uni, count]: [string, any]) => (
+                <div 
+                  key={uni} 
+                  className="px-3 py-1.5 bg-gradient-to-r from-maroon-50 to-slate-50 border border-slate-100 rounded-lg flex items-center gap-2 hover:shadow-md transition-shadow cursor-pointer"
+                >
+                  <span className="font-bold text-slate-700 text-sm">{uni}</span>
+                  <span className="text-slate-400 text-xs">{count}</span>
+                </div>
+              ))
+            )}
           </div>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
+          transition={{ delay: 0.5 }}
           className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden"
         >
-          <div className="p-6 border-b border-slate-100 flex flex-col md:flex-row gap-4 justify-between">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search by name, email, university..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:border-maroon-700 w-64"
-                />
+          <div className="p-4 md:p-5 border-b border-slate-100">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by name, email, university, ticket ID..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:border-maroon-700 focus:ring-2 focus:ring-maroon-700/10 transition-all"
+                  />
+                </div>
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`flex items-center gap-2 px-4 py-2.5 border rounded-xl text-sm font-medium transition-all ${
+                    showFilters || genderFilter !== "all" 
+                      ? "border-maroon-700 bg-maroon-50 text-maroon-700" 
+                      : "border-slate-200 text-slate-600 hover:border-slate-300"
+                  }`}
+                >
+                  <Filter className="w-4 h-4" />
+                  <span className="hidden sm:inline">Filters</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+                </button>
+                <button
+                  onClick={fetchData}
+                  className="flex items-center gap-2 px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:border-slate-300 transition-all"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  <span className="hidden sm:inline">Refresh</span>
+                </button>
+                <button
+                  onClick={downloadCSV}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-maroon-700 to-maroon-800 text-white rounded-xl text-sm font-bold hover:from-maroon-800 hover:to-maroon-900 transition-all shadow-lg shadow-maroon-700/20"
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">Export CSV</span>
+                </button>
               </div>
-              <select
-                value={genderFilter}
-                onChange={(e) => setGenderFilter(e.target.value)}
-                className="px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:border-maroon-700"
-              >
-                <option value="all">All Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
+              
+              <AnimatePresence>
+                {showFilters && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pt-2 pb-2 flex flex-wrap gap-2">
+                      <span className="text-sm text-slate-500 font-medium py-2">Gender:</span>
+                      {["all", "Male", "Female", "Other"].map((gender) => (
+                        <button
+                          key={gender}
+                          onClick={() => setGenderFilter(gender)}
+                          className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                            genderFilter === gender
+                              ? "bg-maroon-700 text-white"
+                              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                          }`}
+                        >
+                          {gender === "all" ? "All" : gender}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-            <button
-              onClick={downloadCSV}
-              className="flex items-center gap-2 px-4 py-2.5 bg-maroon-700 text-white rounded-xl text-sm font-bold hover:bg-maroon-800 transition-colors"
-            >
-              <Download className="w-4 h-4" />
-              Export CSV
-            </button>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-slate-50">
+              <thead className="bg-slate-50/50">
                 <tr>
-                  <th className="px-6 py-4 text-left">
+                  <th className="px-4 py-3 text-left">
                     <button 
                       onClick={() => handleSort("fullName")}
                       className="flex items-center gap-1 text-xs font-bold text-slate-500 uppercase tracking-wider hover:text-maroon-700"
                     >
                       Name
-                      <ArrowUpDown className="w-3 h-3" />
+                      <SortIcon field="fullName" />
                     </button>
                   </th>
-                  <th className="px-6 py-4 text-left">
+                  <th className="px-4 py-3 text-left hidden md:table-cell">
                     <button 
                       onClick={() => handleSort("email")}
                       className="flex items-center gap-1 text-xs font-bold text-slate-500 uppercase tracking-wider hover:text-maroon-700"
                     >
                       Email
-                      <ArrowUpDown className="w-3 h-3" />
+                      <SortIcon field="email" />
                     </button>
                   </th>
-                  <th className="px-6 py-4 text-left">
+                  <th className="px-4 py-3 text-left">
                     <button 
                       onClick={() => handleSort("university")}
                       className="flex items-center gap-1 text-xs font-bold text-slate-500 uppercase tracking-wider hover:text-maroon-700"
                     >
                       University
-                      <ArrowUpDown className="w-3 h-3" />
+                      <SortIcon field="university" />
                     </button>
                   </th>
-                  <th className="px-6 py-4 text-left">
+                  <th className="px-4 py-3 text-left">
                     <button 
                       onClick={() => handleSort("gender")}
                       className="flex items-center gap-1 text-xs font-bold text-slate-500 uppercase tracking-wider hover:text-maroon-700"
                     >
                       Gender
-                      <ArrowUpDown className="w-3 h-3" />
+                      <SortIcon field="gender" />
                     </button>
                   </th>
-
-                  <th className="px-6 py-4 text-left">
+                  <th className="px-4 py-3 text-left hidden lg:table-cell">
                     <span className="flex items-center gap-1 text-xs font-bold text-slate-500 uppercase tracking-wider">
                       <Droplets className="w-3 h-3" />
                       Blood
                     </span>
                   </th>
-                  <th className="px-6 py-4 text-left">
+                  <th className="px-4 py-3 text-left">
                     <button 
                       onClick={() => handleSort("timestamp")}
                       className="flex items-center gap-1 text-xs font-bold text-slate-500 uppercase tracking-wider hover:text-maroon-700"
                     >
                       Date
-                      <ArrowUpDown className="w-3 h-3" />
+                      <SortIcon field="timestamp" />
                     </button>
                   </th>
                 </tr>
@@ -369,8 +467,12 @@ export default function AdminDashboard() {
               <tbody className="divide-y divide-slate-100">
                 {filteredTickets.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
-                      No registrations found
+                    <td colSpan={6} className="px-6 py-16 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <Users className="w-12 h-12 text-slate-200" />
+                        <p className="text-slate-400 font-medium">No registrations found</p>
+                        <p className="text-slate-300 text-sm">Try adjusting your search or filters</p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
@@ -379,25 +481,25 @@ export default function AdminDashboard() {
                       key={ticket.ticketId}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      transition={{ delay: i * 0.02 }}
-                      className="hover:bg-slate-50"
+                      transition={{ delay: i * 0.01 }}
+                      className="hover:bg-slate-50/50 transition-colors group"
                     >
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3">
                         <div>
-                          <p className="font-bold text-maroon-900">{ticket.fullName}</p>
-                          <p className="text-xs text-slate-400">{ticket.ticketId}</p>
+                          <p className="font-bold text-slate-800 group-hover:text-maroon-700 transition-colors">{ticket.fullName}</p>
+                          <p className="text-xs text-slate-400 font-mono">{ticket.ticketId}</p>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <p className="text-sm text-slate-600">{ticket.email}</p>
+                      <td className="px-4 py-3 hidden md:table-cell">
+                        <p className="text-sm text-slate-600 truncate max-w-[200px]">{ticket.email}</p>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="px-3 py-1 bg-maroon-700/10 text-maroon-700 rounded-lg text-xs font-bold">
+                      <td className="px-4 py-3">
+                        <span className="px-2.5 py-1 bg-gradient-to-r from-maroon-50 to-slate-50 text-maroon-700 rounded-lg text-xs font-bold border border-maroon-100">
                           {ticket.university}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
+                      <td className="px-4 py-3">
+                        <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${
                           ticket.gender === "Male" ? "bg-blue-50 text-blue-600" :
                           ticket.gender === "Female" ? "bg-pink-50 text-pink-600" :
                           "bg-purple-50 text-purple-600"
@@ -405,18 +507,15 @@ export default function AdminDashboard() {
                           {ticket.gender}
                         </span>
                       </td>
-
-                      <td className="px-6 py-4">
-                        <span className="text-sm font-semibold text-red-600">{ticket.bloodGroup}</span>
+                      <td className="px-4 py-3 hidden lg:table-cell">
+                        <span className="text-sm font-bold text-red-600">{ticket.bloodGroup}</span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3">
                         <p className="text-xs text-slate-400">
                           {new Date(ticket.timestamp).toLocaleDateString("en-GB", {
                             day: "2-digit",
                             month: "short",
                             year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit"
                           })}
                         </p>
                       </td>
@@ -427,18 +526,28 @@ export default function AdminDashboard() {
             </table>
           </div>
 
-          <div className="px-6 py-4 border-t border-slate-100 bg-slate-50">
+          <div className="px-4 md:px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-sm text-slate-500 font-medium">
-              Showing {filteredTickets.length} of {tickets.length} registrations
+              Showing <span className="text-slate-800 font-bold">{filteredTickets.length}</span> of <span className="text-slate-800 font-bold">{tickets.length}</span> registrations
             </p>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-400">
+                {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+              </span>
+            </div>
           </div>
         </motion.div>
       </div>
 
-      <div className="border-t border-slate-200 py-8 bg-white mt-12">
-        <p className="text-center text-xs text-slate-400 font-semibold tracking-wider">
-          OmniTick · Admin Panel · © 2026
-        </p>
+      <div className="border-t border-slate-200 py-6 bg-white mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-slate-400 font-semibold tracking-wider">
+            OmniTick Admin Panel
+          </p>
+          <p className="text-xs text-slate-400 font-semibold tracking-wider">
+            © 2026 All Rights Reserved
+          </p>
+        </div>
       </div>
     </main>
   );

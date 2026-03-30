@@ -8,9 +8,10 @@ const styles = StyleSheet.create({
     padding: 0,
     backgroundColor: "#FAFAFA",
     fontFamily: "Helvetica",
+    minHeight: "100%",
   },
   container: {
-    flex: 1,
+    flexGrow: 1,
     position: "relative",
   },
   topSection: {
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   infoSection: {
-    padding: "20 50",
+    padding: "15 50",
   },
   sectionTitle: {
     fontSize: 9,
@@ -324,9 +325,6 @@ const TicketDocument = ({ data, ticketId, qrCodeUrl }: { data: RegistrationData;
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.container}>
-          <View style={styles.decorativeCircle} />
-          <View style={styles.decorativeCircle2} />
-          
           <View style={styles.topSection}>
             <View style={styles.header}>
               <View style={styles.headerLeft}>
@@ -405,22 +403,15 @@ const TicketDocument = ({ data, ticketId, qrCodeUrl }: { data: RegistrationData;
           </View>
 
           <View style={styles.footer}>
-            <View style={styles.footerContent}>
-              <View style={styles.footerLeft}>
-                <Text style={styles.instructionTitle}>Entry Requirements</Text>
-                <Text style={styles.instructionText}>
-                  • Present original student ID{'\n'}
-                  • This pass is non-transferable and tied to your identity{'\n'}
-                  • Gate opens at 1:00 PM - please arrive early{'\n'}
-                  • No outside food or beverages allowed{'\n'}
-                  • Follow venue staff instructions at all times
-                </Text>
-              </View>
-              <View style={styles.footerRight}>
-                <View style={styles.qrPlaceholder}>
-                  <Text style={styles.qrText}>QR Code</Text>
-                </View>
-              </View>
+            <View>
+              <Text style={styles.instructionTitle}>Entry Requirements</Text>
+              <Text style={styles.instructionText}>
+                • Present original student ID{'\n'}
+                • This pass is non-transferable and tied to your identity{'\n'}
+                • Gate opens at 1:00 PM - please arrive early{'\n'}
+                • No outside food or beverages allowed{'\n'}
+                • Follow venue staff instructions at all times
+              </Text>
             </View>
             <View style={styles.bottomBarcode}>
               <Text style={styles.copyright}>

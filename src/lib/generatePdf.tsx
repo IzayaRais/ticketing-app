@@ -8,11 +8,14 @@ const styles = StyleSheet.create({
     padding: 0,
     backgroundColor: "#FAFAFA",
     fontFamily: "Helvetica",
-    minHeight: "100%",
   },
   container: {
-    flexGrow: 1,
-    position: "relative",
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "space-between",
+  },
+  mainContent: {
+    flex: 1,
   },
   topSection: {
     backgroundColor: "#1A1A2E",
@@ -325,6 +328,7 @@ const TicketDocument = ({ data, ticketId, qrCodeUrl }: { data: RegistrationData;
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.container}>
+          <View style={styles.mainContent}>
           <View style={styles.topSection}>
             <View style={styles.header}>
               <View style={styles.headerLeft}>
@@ -400,6 +404,7 @@ const TicketDocument = ({ data, ticketId, qrCodeUrl }: { data: RegistrationData;
 
           <View style={styles.qrSection}>
             <Image src={qrCodeUrl} style={styles.qrImage} />
+          </View>
           </View>
 
           <View style={styles.footer}>

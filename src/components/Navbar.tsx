@@ -25,6 +25,7 @@ export default function Navbar() {
     const handler = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handler);
     
+    // Sync verification state from sessionStorage if session is null
     if (!session) {
       const email = sessionStorage.getItem("verifiedEmail");
       setVerifiedEmail(email);
@@ -55,32 +56,32 @@ export default function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/50"
+          ? "bg-white/90 backdrop-blur-xl shadow-sm border-b border-maroon-700/5"
           : "bg-transparent"
       }`}
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform duration-300">
-            <Ticket className="w-5 h-5 text-slate-900" />
+          <div className="w-10 h-10 grad-maroon rounded-xl flex items-center justify-center shadow-lg shadow-maroon-700/20 group-hover:scale-110 transition-transform duration-300">
+            <Ticket className="w-5 h-5 text-white" />
           </div>
           <div className="leading-tight">
-            <span className="block text-lg font-black text-white tracking-tight leading-none">Antorip</span>
-            <span className="block text-[11px] font-bold text-amber-500/60 uppercase tracking-[0.2em] mt-0.5">Farewell</span>
+            <span className="block text-lg font-black text-maroon-950 tracking-tight leading-none">Antorip</span>
+            <span className="block text-[11px] font-bold text-maroon-600/60 uppercase tracking-[0.2em] mt-0.5">Farewell</span>
           </div>
         </Link>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-1 bg-slate-800/50 p-1.5 rounded-2xl border border-slate-700/50">
+        <div className="hidden md:flex items-center gap-1 bg-slate-100/30 p-1.5 rounded-2xl border border-slate-200/50">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
+              className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${
                 pathname === link.href
-                  ? "text-slate-900 bg-amber-500 shadow-sm shadow-amber-500/20"
-                  : "text-slate-400 hover:text-white hover:bg-slate-700/50"
+                  ? "text-maroon-700 bg-white shadow-sm shadow-maroon-700/5 ring-1 ring-slate-200"
+                  : "text-slate-400 hover:text-maroon-950"
               }`}
             >
               {link.label}
@@ -93,20 +94,20 @@ export default function Navbar() {
           {(session || verifiedEmail) ? (
             <div className="flex items-center gap-3">
               <div className="flex flex-col items-end px-2">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">
+                <span className="text-[10px] font-black text-maroon-600/40 uppercase tracking-widest leading-none mb-1">
                   {userRole}
                 </span>
-                <span className="text-sm font-bold text-white truncate max-w-[140px]">
+                <span className="text-sm font-black text-maroon-950 truncate max-w-[140px]">
                   {userDisplayName}
                 </span>
               </div>
-              <div className="flex items-center gap-1 pl-3 border-l border-slate-700">
-                <div className="w-9 h-9 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center shadow-lg shadow-amber-500/10 ring-2 ring-slate-800 overflow-hidden">
-                  <User className="w-4 h-4 text-slate-900" />
+              <div className="flex items-center gap-1 pl-3 border-l border-slate-200">
+                <div className="w-9 h-9 grad-maroon rounded-full flex items-center justify-center shadow-lg shadow-maroon-700/10 ring-2 ring-white overflow-hidden">
+                  <User className="w-4 h-4 text-white" />
                 </div>
                 <button
                   onClick={session ? handleSignOut : clearVerifiedSession}
-                  className="p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-slate-800 transition-all"
+                  className="p-2 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all"
                   title="Sign Out"
                 >
                   <LogOut className="w-4 h-4" />
@@ -116,7 +117,7 @@ export default function Navbar() {
           ) : (
             <Link
               href="/dashboard"
-              className="text-xs font-bold uppercase tracking-[0.2em] px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 shadow-[0_0_30px_rgba(245,158,11,0.3)] hover:shadow-[0_0_40px_rgba(245,158,11,0.5)] hover:scale-105 transition-all duration-300"
+              className="btn-primary text-xs font-black uppercase tracking-[0.2em] px-8 py-3 rounded-2xl shadow-xl shadow-maroon-700/20"
             >
               Register Now
             </Link>
@@ -126,7 +127,7 @@ export default function Navbar() {
         {/* Mobile toggle */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden p-2 rounded-xl text-slate-300 hover:bg-slate-800 transition-colors"
+          className="md:hidden p-2 rounded-xl text-maroon-700 hover:bg-maroon-700/8 transition-colors"
         >
           {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
@@ -139,17 +140,17 @@ export default function Navbar() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="md:hidden absolute top-full left-0 right-0 bg-slate-950/98 backdrop-blur-2xl border-b border-slate-800 shadow-2xl"
+            className="md:hidden absolute top-full left-0 right-0 bg-white/98 backdrop-blur-2xl border-b border-slate-100 shadow-2xl"
           >
             <div className="p-6 space-y-2">
               {(session || verifiedEmail) && (
-                <div className="p-5 mb-4 bg-slate-800/50 rounded-2xl border border-slate-700/50 flex items-center gap-4">
-                   <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center">
-                     <User className="w-6 h-6 text-slate-900" />
+                <div className="p-5 mb-4 bg-cream rounded-2xl border border-maroon-700/5 flex items-center gap-4">
+                   <div className="w-12 h-12 grad-maroon rounded-full flex items-center justify-center shadow-inner">
+                     <User className="w-6 h-6 text-white" />
                    </div>
                    <div>
-                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">{userRole}</p>
-                     <p className="text-base font-bold text-white leading-tight">{userDisplayName}</p>
+                     <p className="text-[10px] font-black text-maroon-600/40 uppercase tracking-widest leading-none mb-1">{userRole}</p>
+                     <p className="text-base font-black text-maroon-950 leading-tight">{userDisplayName}</p>
                    </div>
                 </div>
               )}
@@ -158,28 +159,28 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className={`flex items-center px-5 py-4 rounded-2xl text-xs font-bold uppercase tracking-widest ${
+                  className={`flex items-center px-5 py-4 rounded-2xl text-xs font-black uppercase tracking-widest ${
                     pathname === link.href
-                      ? "text-slate-900 bg-amber-500 border border-amber-400"
-                      : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                      ? "text-maroon-700 bg-maroon-700/5 border border-maroon-700/10"
+                      : "text-slate-400 hover:bg-slate-50"
                   }`}
                 >
                   {link.label}
                 </Link>
               ))}
-              <div className="pt-4 mt-4 border-t border-slate-800">
+              <div className="pt-4 mt-4 border-t border-slate-100">
                 {(session || verifiedEmail) ? (
                   <button
                     onClick={session ? handleSignOut : clearVerifiedSession}
-                    className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-2xl bg-red-500/10 text-red-400 text-xs font-bold uppercase tracking-widest border border-red-500/20 hover:bg-red-500/20 transition-colors"
+                    className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-2xl bg-red-50 text-red-600 text-xs font-black uppercase tracking-widest border border-red-100"
                   >
-                    <LogOut className="w-4 h-4" /> Sign Out
+                    <LogOut className="w-4 h-4" /> Sign Out from Concert Portal
                   </button>
                 ) : (
                   <Link
                     href="/dashboard"
                     onClick={() => setIsOpen(false)}
-                    className="block w-full text-center bg-gradient-to-r from-amber-500 to-amber-600 py-5 rounded-2xl text-slate-900 text-xs font-bold uppercase tracking-widest shadow-[0_0_30px_rgba(245,158,11,0.3)]"
+                    className="block w-full text-center grad-maroon py-5 rounded-2xl text-white text-xs font-black uppercase tracking-widest shadow-xl shadow-maroon-700/20"
                   >
                     Get Entry Pass
                   </Link>

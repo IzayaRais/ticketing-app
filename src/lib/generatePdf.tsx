@@ -1,5 +1,6 @@
 import React from "react";
-import { Document, Page, Text, View, StyleSheet, renderToBuffer, Font } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, renderToBuffer, Font, Image } from "@react-pdf/renderer";
+import QRCode from "qrcode";
 import { RegistrationData } from "./validations";
 
 const styles = StyleSheet.create({
@@ -296,9 +297,18 @@ const styles = StyleSheet.create({
     bottom: 100,
     left: -30,
   },
+  qrSection: {
+    padding: "10 50",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  qrImage: {
+    width: 70,
+    height: 70,
+  },
 });
 
-const TicketDocument = ({ data, ticketId }: { data: RegistrationData; ticketId: string }) => {
+const TicketDocument = ({ data, ticketId, qrCodeUrl }: { data: RegistrationData; ticketId: string; qrCodeUrl: string }) => {
   const getGenderStyle = (gender: string) => {
     switch (gender) {
       case "Male":
@@ -392,6 +402,10 @@ const TicketDocument = ({ data, ticketId }: { data: RegistrationData; ticketId: 
             </View>
           </View>
 
+          <View style={styles.qrSection}>
+            <Image src={qrCodeUrl} style={styles.qrImage} />
+          </View>
+
           <View style={styles.footer}>
             <View style={styles.footerContent}>
               <View style={styles.footerLeft}>
@@ -424,7 +438,9 @@ const TicketDocument = ({ data, ticketId }: { data: RegistrationData; ticketId: 
 
 export async function generateTicketPdf(data: RegistrationData, ticketId: string) {
   try {
-    const buffer = await renderToBuffer(<TicketDocument data={data} ticketId={ticketId} />);
+    const qrData = `${ticketId}|${data.fullName}`;
+    const qrCodeUrl = await QRCode.toDataURL(qrData, { width: 200, margin: 1 });
+    const buffer = await renderToBuffer(<TicketDocument data={data} ticketId={ticketId} qrCodeUrl={qrCodeUrl} />);
     return buffer;
   } catch (error) {
     console.error("Error generating PDF:", error);

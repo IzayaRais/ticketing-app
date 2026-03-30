@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAllTickets } from "@/lib/googleSheets";
+import { adminTicketSchema } from "@/lib/validations";
 
 export async function GET() {
   try {
@@ -37,6 +38,31 @@ export async function GET() {
     console.error("Admin API error:", error);
     return NextResponse.json(
       { message: "Failed to fetch tickets" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    
+    const validation = adminTicketSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        { message: "Invalid request", errors: validation.error.issues },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      { message: "Admin action processed successfully" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Admin POST error:", error);
+    return NextResponse.json(
+      { message: "Failed to process admin action" },
       { status: 500 }
     );
   }

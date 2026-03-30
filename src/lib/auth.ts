@@ -1,13 +1,14 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import { signInSchema } from "@/lib/validations";
 
 const ADMIN_EMAIL = "raisultensors@gmail.com";
 
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60,
   },
   providers: [
     GoogleProvider({
@@ -21,14 +22,24 @@ export const authOptions: NextAuthOptions = {
         ticketId: { label: "Ticket ID", type: "text" },
       },
       async authorize(credentials) {
-        if (credentials?.email && credentials?.ticketId) {
-          return {
-            id: credentials.ticketId,
-            email: credentials.email,
-            name: "Premium Member",
-          };
+        if (!credentials?.email || !credentials?.ticketId) {
+          return null;
         }
-        return null;
+
+        const validation = signInSchema.safeParse({
+          email: credentials.email,
+          password: credentials.ticketId,
+        });
+
+        if (!validation.success) {
+          return null;
+        }
+
+        return {
+          id: credentials.ticketId,
+          email: credentials.email,
+          name: "Premium Member",
+        };
       },
     }),
   ],

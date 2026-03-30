@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTicketByEmail } from "@/lib/googleSheets";
+import { ticketVerifySchema } from "@/lib/validations";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -8,6 +9,14 @@ export async function GET(req: NextRequest) {
 
   if (!email || !ticketId) {
     return NextResponse.json({ valid: false, message: "Email and Ticket ID are required." }, { status: 400 });
+  }
+
+  const validation = ticketVerifySchema.safeParse({ ticketId });
+  if (!validation.success) {
+    return NextResponse.json(
+      { valid: false, message: validation.error.issues[0].message },
+      { status: 400 }
+    );
   }
 
   try {

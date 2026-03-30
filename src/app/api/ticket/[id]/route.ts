@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getTicketById } from "@/lib/googleSheets";
 import { generateTicketPdf } from "@/lib/generatePdf";
+import { ticketIdSchema } from "@/lib/validations";
 
 export async function GET(
   request: Request,
@@ -12,6 +13,14 @@ export async function GET(
     if (!id) {
       return NextResponse.json(
         { message: "Ticket ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const validation = ticketIdSchema.safeParse({ id });
+    if (!validation.success) {
+      return NextResponse.json(
+        { message: validation.error.issues[0].message },
         { status: 400 }
       );
     }

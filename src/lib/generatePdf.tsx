@@ -194,10 +194,6 @@ const styles = StyleSheet.create({
     color: "#805AD5",
   },
   footer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
     backgroundColor: "#1A1A2E",
     padding: "20 50",
     borderTopLeftRadius: 20,
@@ -262,8 +258,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 15,
-    backgroundColor: "#F7FAFC",
+    paddingTop: 12,
+    backgroundColor: "#1A1A2E",
+    borderTopWidth: 1,
+    borderTopColor: "#2D3152",
   },
   barcodeLine: {
     height: 30,
@@ -273,7 +271,7 @@ const styles = StyleSheet.create({
   },
   copyright: {
     fontSize: 7,
-    color: "#718096",
+    color: "#FFFFFF",
     textAlign: "center",
     marginTop: 12,
   },
@@ -411,9 +409,9 @@ const TicketDocument = ({ data, ticketId, qrCodeUrl }: { data: RegistrationData;
               <View style={styles.footerLeft}>
                 <Text style={styles.instructionTitle}>Entry Requirements</Text>
                 <Text style={styles.instructionText}>
-                  • Present original student ID card at the entrance{'\n'}
+                  • Present original student ID{'\n'}
                   • This pass is non-transferable and tied to your identity{'\n'}
-                  • Gate opens at 6:00 PM - please arrive early{'\n'}
+                  • Gate opens at 1:00 PM - please arrive early{'\n'}
                   • No outside food or beverages allowed{'\n'}
                   • Follow venue staff instructions at all times
                 </Text>

@@ -95,7 +95,7 @@ export default function TicketCard({ ticket, onDownload }: { ticket: TicketData;
                   <div className="flex items-start gap-3">
                     <Calendar className="w-4 h-4 text-maroon-300 mt-0.5" />
                     <div>
-                      <p className="text-xs font-bold text-white">Gate Opens: 6:00 PM</p>
+                      <p className="text-xs font-bold text-white">Gate Opens: 1:00 PM</p>
                       <p className="text-[10px] text-maroon-200">Evening Session</p>
                     </div>
                   </div>

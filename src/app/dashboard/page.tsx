@@ -150,7 +150,7 @@ function DashboardContent() {
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
                       <Clock className="w-5 h-5 text-maroon-600" />
-                      <span className="text-sm font-bold text-slate-700">Gate Opens: 6:00 PM</span>
+                      <span className="text-sm font-bold text-slate-700">Gate Opens: 1:00 PM</span>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
                       <CheckCircle className="w-5 h-5 text-green-600" />

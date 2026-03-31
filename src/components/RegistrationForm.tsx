@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registrationSchema, RegistrationData } from "@/lib/validations";
@@ -16,7 +16,6 @@ const genders = ["Male", "Female", "Other"] as const;
 
 function SelectField({
   label,
-  icon,
   value,
   onChange,
   options,
@@ -24,66 +23,35 @@ function SelectField({
   error,
 }: {
   label: string;
-  icon: React.ReactNode;
   value: string;
   onChange: (val: string) => void;
   options: readonly string[];
   placeholder: string;
   error?: string;
 }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
   return (
-    <div className={`relative ${open ? "z-50" : "z-auto"}`} ref={ref}>
+    <div>
       <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1.5">
         {label}
       </label>
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border text-left transition-all duration-200 bg-white ${
-          open
-            ? "border-maroon-700 ring-4 ring-maroon-700/8 shadow-lg"
-            : error
-              ? "border-red-300 focus:border-red-400"
-              : "border-slate-200/80 hover:border-slate-300"
-        }`}
-      >
-        <span className="text-maroon-700 flex-shrink-0">{icon}</span>
-        <span className={`flex-1 text-sm font-medium ${value ? "text-slate-800" : "text-slate-400"}`}>
-          {value || placeholder}
-        </span>
-        <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
-      </button>
-
-      {open && (
-        <div className="absolute z-50 mt-2 w-full bg-white rounded-xl border border-slate-200/80 shadow-xl shadow-slate-900/5 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+      <div className="relative">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={`w-full appearance-none px-4 py-3.5 pr-10 rounded-xl border text-sm font-medium outline-none transition-all duration-200 bg-white cursor-pointer ${
+            error
+              ? "border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-400/8"
+              : "border-slate-200/80 hover:border-slate-300 focus:border-maroon-700 focus:ring-4 focus:ring-maroon-700/8"
+          } ${value ? "text-slate-800" : "text-slate-400"}`}
+        >
+          <option value="" disabled>{placeholder}</option>
           {options.map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => { onChange(opt); setOpen(false); }}
-              className={`w-full text-left px-4 py-2.5 text-sm font-medium transition-colors ${
-                value === opt
-                  ? "bg-maroon-50 text-maroon-700"
-                  : "text-slate-600 hover:bg-slate-50"
-              }`}
-            >
-              {opt}
-            </button>
+            <option key={opt} value={opt}>{opt}</option>
           ))}
-        </div>
-      )}
-      {error && <p className="text-xs font-medium text-red-500 mt-1.5 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{error}</p>}
+        </select>
+        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+      </div>
+      {error && <p className="text-xs font-medium text-red-500 mt-1.5">{error}</p>}
     </div>
   );
 }
@@ -93,33 +61,18 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [step, setStep] = useState(0);
-  const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
-
-  useEffect(() => {
-    const el = formRef.current;
-    if (!el) return;
-    const items = el.querySelectorAll("[data-animate]");
-    items.forEach((item, i) => {
-      (item as HTMLElement).style.setProperty("--delay", `${i * 60}ms`);
-    });
-  }, [step]);
 
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
+    getValues,
     formState: { errors },
   } = useForm<RegistrationData>({
     resolver: zodResolver(registrationSchema),
     defaultValues: { terms: false },
   });
-
-  const acceptedTerms = watch("terms");
-  const university = watch("university");
-  const gender = watch("gender");
-  const bloodGroup = watch("bloodGroup");
 
   const onSubmit = useCallback(async (data: RegistrationData) => {
     setIsSubmitting(true);
@@ -164,7 +117,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" ref={formRef}>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       {error && (
         <div className="flex items-start gap-3 p-4 bg-red-50/80 border border-red-100 rounded-xl">
           <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
@@ -180,8 +133,8 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
       {/* Step indicator */}
       <div className="flex items-center gap-2 mb-6">
         {[0, 1, 2].map((s) => (
-          <div key={s} className="flex items-center gap-2 flex-1">
-            <div className={`h-1 flex-1 rounded-full transition-colors duration-300 ${s <= step ? "bg-maroon-700" : "bg-slate-100"}`} />
+          <div key={s} className="flex-1">
+            <div className={`h-1 rounded-full transition-colors duration-300 ${s <= step ? "bg-maroon-700" : "bg-slate-100"}`} />
           </div>
         ))}
       </div>
@@ -189,7 +142,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
       {/* Step 1: Personal Info */}
       {step === 0 && (
         <div className="space-y-4">
-          <div data-animate className="opacity-0 animate-[fadeInUp_0.4s_ease_forwards] [animation-delay:var(--delay)]">
+          <div>
             <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1.5">
               Full Name
             </label>
@@ -202,7 +155,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
             {errors.fullName && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.fullName.message}</p>}
           </div>
 
-          <div data-animate className="opacity-0 animate-[fadeInUp_0.4s_ease_forwards] [animation-delay:var(--delay)]">
+          <div>
             <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1.5">
               Email Address
             </label>
@@ -215,7 +168,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
             {errors.email && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.email.message}</p>}
           </div>
 
-          <div data-animate className="opacity-0 animate-[fadeInUp_0.4s_ease_forwards] [animation-delay:var(--delay)]">
+          <div>
             <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1.5">
               Phone Number
             </label>
@@ -240,7 +193,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
       {/* Step 2: Academic Info */}
       {step === 1 && (
         <div className="space-y-4">
-          <div data-animate className="opacity-0 animate-[fadeInUp_0.4s_ease_forwards] [animation-delay:var(--delay)]">
+          <div>
             <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1.5">
               Student ID
             </label>
@@ -253,29 +206,23 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
             {errors.studentId && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.studentId.message}</p>}
           </div>
 
-          <div data-animate className="opacity-0 animate-[fadeInUp_0.4s_ease_forwards] [animation-delay:var(--delay)]">
-            <SelectField
-              label="University"
-              icon={<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>}
-              value={university}
-              onChange={(val) => setValue("university", val as "MIST" | "BUP" | "AFMC", { shouldValidate: true })}
-              options={institutes}
-              placeholder="Select your university"
-              error={errors.university?.message}
-            />
-          </div>
+          <SelectField
+            label="University"
+            value={getValues("university") || ""}
+            onChange={(val) => setValue("university", val as "MIST" | "BUP" | "AFMC", { shouldValidate: true })}
+            options={institutes}
+            placeholder="Select your university"
+            error={errors.university?.message}
+          />
 
-          <div data-animate className="opacity-0 animate-[fadeInUp_0.4s_ease_forwards] [animation-delay:var(--delay)]">
-            <SelectField
-              label="Gender"
-              icon={<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
-              value={gender}
-              onChange={(val) => setValue("gender", val as "Male" | "Female" | "Other", { shouldValidate: true })}
-              options={genders}
-              placeholder="Select gender"
-              error={errors.gender?.message}
-            />
-          </div>
+          <SelectField
+            label="Gender"
+            value={getValues("gender") || ""}
+            onChange={(val) => setValue("gender", val as "Male" | "Female" | "Other", { shouldValidate: true })}
+            options={genders}
+            placeholder="Select gender"
+            error={errors.gender?.message}
+          />
 
           <div className="flex gap-3 mt-2">
             <button
@@ -299,19 +246,16 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
       {/* Step 3: Details & Submit */}
       {step === 2 && (
         <div className="space-y-4">
-          <div data-animate className="opacity-0 animate-[fadeInUp_0.4s_ease_forwards] [animation-delay:var(--delay)]">
-            <SelectField
-              label="Blood Group"
-              icon={<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>}
-              value={bloodGroup}
-              onChange={(val) => setValue("bloodGroup", val, { shouldValidate: true })}
-              options={bloodGroups as unknown as string[]}
-              placeholder="Select blood group"
-              error={errors.bloodGroup?.message}
-            />
-          </div>
+          <SelectField
+            label="Blood Group"
+            value={getValues("bloodGroup") || ""}
+            onChange={(val) => setValue("bloodGroup", val, { shouldValidate: true })}
+            options={bloodGroups as unknown as string[]}
+            placeholder="Select blood group"
+            error={errors.bloodGroup?.message}
+          />
 
-          <div data-animate className="opacity-0 animate-[fadeInUp_0.4s_ease_forwards] [animation-delay:var(--delay)] pt-1">
+          <div className="pt-1">
             <label className="flex items-start gap-3 cursor-pointer group">
               <div className="relative mt-0.5 flex-shrink-0">
                 <input
@@ -319,12 +263,8 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
                   {...register("terms")}
                   className="peer sr-only"
                 />
-                <div className={`w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center ${
-                  acceptedTerms
-                    ? "bg-maroon-700 border-maroon-700"
-                    : "bg-white border-slate-200 group-hover:border-slate-300"
-                }`}>
-                  {acceptedTerms && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
+                <div className="w-5 h-5 rounded-md border-2 border-slate-200 bg-white flex items-center justify-center peer-checked:bg-maroon-700 peer-checked:border-maroon-700 transition-all group-hover:border-slate-300">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100" />
                 </div>
               </div>
               <span className="text-sm text-slate-500 leading-relaxed">
@@ -344,7 +284,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
             </button>
             <button
               type="submit"
-              disabled={isSubmitting || !acceptedTerms}
+              disabled={isSubmitting}
               className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-maroon-700 text-white rounded-xl font-semibold text-sm hover:bg-maroon-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (

@@ -9,10 +9,43 @@ const inter = Inter({
   display: "swap",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://antorip.vercel.app";
+const ogImage = "/og-image.jpg";
+
 export const metadata: Metadata = {
-  title: "Antorip Farewell Concert 2026",
-  description: "Secure registration and ticketing for the Antorip Farewell Concert — April 09, 2026.",
-  keywords: ["Antorip", "Farewell Concert", "MIST", "2026", "Event Ticketing"],
+  title: {
+    default: "Antorip Farewell Concert 2026",
+    template: "%s | Antorip Farewell Concert",
+  },
+  description: "Secure registration and ticketing for the Antorip Farewell Concert — April 09, 2026 at MIST Central Field.",
+  keywords: ["Antorip", "Farewell Concert", "MIST", "2026", "Event Ticketing", "Dhaka"],
+  metadataBase: new URL(siteUrl),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    siteName: "Antorip Farewell Concert 2026",
+    title: "Antorip Farewell Concert 2026",
+    description: "One final night of music and legacy. April 09, 2026 at MIST Central Field.",
+    images: [
+      {
+        url: ogImage,
+        width: 1200,
+        height: 630,
+        alt: "Antorip Farewell Concert 2026",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Antorip Farewell Concert 2026",
+    description: "One final night of music and legacy. April 09, 2026 at MIST Central Field.",
+    images: [ogImage],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

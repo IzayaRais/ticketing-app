@@ -68,7 +68,7 @@ export default function ScanPage() {
 
       if (!res.ok) {
         setResult({ type: "error", ticketId: finalId, message: data.message || "Check-in failed" });
-        setScanHistory(prev => [{ ticketId: finalId, fullName: "Unknown", type: "error", timestamp: new Date().toLocaleTimeString() }, ...prev].slice(0, 20));
+        setScanHistory(prev => [{ ticketId: finalId, fullName: "Unknown", type: "error" as const, timestamp: new Date().toLocaleTimeString() }, ...prev].slice(0, 20));
       } else if (data.alreadyCheckedIn) {
         const entry = {
           ticketId: finalId,
@@ -105,7 +105,7 @@ export default function ScanPage() {
       }
     } catch {
       setResult({ type: "error", ticketId: finalId, message: "Network error. Check connection." });
-      setScanHistory(prev => [{ ticketId: finalId, fullName: "Unknown", type: "error", timestamp: new Date().toLocaleTimeString() }, ...prev].slice(0, 20));
+      setScanHistory(prev => [{ ticketId: finalId, fullName: "Unknown", type: "error" as const, timestamp: new Date().toLocaleTimeString() }, ...prev].slice(0, 20));
     }
 
     setProcessing(false);

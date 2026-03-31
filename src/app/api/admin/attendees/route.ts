@@ -54,6 +54,8 @@ export async function GET() {
       bloodGroup: row.get("bloodGroup"),
       status: row.get("status"),
       timestamp: row.get("timestamp"),
+      checkedIn: row.get("checkedIn") || "",
+      checkedInAt: row.get("checkedInAt") || "",
     }));
 
     return NextResponse.json({ attendees });

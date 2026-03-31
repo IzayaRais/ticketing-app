@@ -165,10 +165,52 @@ export async function getAllTickets() {
       bloodGroup: r.get("bloodGroup"),
       status: r.get("status"),
       timestamp: r.get("timestamp"),
+      checkedIn: r.get("checkedIn") || "",
+      checkedInAt: r.get("checkedInAt") || "",
     }));
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error("❌ Google Sheets fetch all failed:", message);
+    throw error;
+  }
+}
+
+export async function markTicketCheckedIn(ticketId: string) {
+  try {
+    const doc = await getDoc();
+    const sheet = doc.sheetsByIndex[0];
+    const rows = await sheet.getRows();
+
+    const row = rows.find((r) => r.get("ticketId") === ticketId);
+    if (!row) return { found: false };
+
+    const alreadyChecked = row.get("checkedIn") === "true";
+    if (alreadyChecked) {
+      return {
+        found: true,
+        alreadyCheckedIn: true,
+        checkedInAt: row.get("checkedInAt") || "",
+        fullName: row.get("fullName"),
+        email: row.get("email"),
+        university: row.get("university"),
+      };
+    }
+
+    row.set("checkedIn", "true");
+    row.set("checkedInAt", new Date().toISOString());
+    await row.save();
+
+    return {
+      found: true,
+      alreadyCheckedIn: false,
+      fullName: row.get("fullName"),
+      email: row.get("email"),
+      university: row.get("university"),
+      ticketId: row.get("ticketId"),
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("❌ Check-in failed:", message);
     throw error;
   }
 }

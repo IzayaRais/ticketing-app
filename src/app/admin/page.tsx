@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Users, UserCheck, UserX, Download, Search, 
   ArrowUpDown, Ticket, GraduationCap, Droplets,
-  ChevronDown, Shield, LogOut, Filter, RefreshCw
+  ChevronDown, Shield, LogOut, Filter, RefreshCw, QrCode
 } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -421,6 +421,13 @@ export default function AdminDashboard() {
                   <RefreshCw className="w-4 h-4" />
                   <span className="hidden sm:inline">Refresh</span>
                 </button>
+                <Link
+                  href="/scan"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700 transition-all shadow-lg shadow-green-600/20"
+                >
+                  <QrCode className="w-4 h-4" />
+                  <span className="hidden sm:inline">Scan Tickets</span>
+                </Link>
                 <button
                   onClick={downloadCSV}
                   className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-maroon-700 to-maroon-800 text-white rounded-xl text-sm font-bold hover:from-maroon-800 hover:to-maroon-900 transition-all shadow-lg shadow-maroon-700/20"

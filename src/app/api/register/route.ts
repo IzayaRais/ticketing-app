@@ -5,7 +5,46 @@ import { appendToSheet, getTicketByEmail } from "@/lib/googleSheets";
 import { generateTicketPdf } from "@/lib/generatePdf";
 import { sendEmail, generateTicketEmailHTML } from "@/lib/sendEmail";
 
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX_REQUESTS = 5;
+const ipRequests = new Map<string, number[]>();
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = ipRequests.get(ip) || [];
+  const recent = timestamps.filter(t => now - t < RATE_LIMIT_WINDOW_MS);
+  
+  if (recent.length >= RATE_LIMIT_MAX_REQUESTS) {
+    return false;
+  }
+  
+  recent.push(now);
+  ipRequests.set(ip, recent);
+  
+  if (recent.length > RATE_LIMIT_MAX_REQUESTS * 2) {
+    ipRequests.set(ip, recent.slice(-RATE_LIMIT_MAX_REQUESTS));
+  }
+  
+  return true;
+}
+
+function getClientIp(request: Request): string {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
+
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json(
+      { message: "Too many registration attempts. Please try again later." },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await request.json();
     const result = registrationSchema.safeParse(body);
@@ -19,67 +58,41 @@ export async function POST(request: Request) {
 
     const { data } = result;
 
-    // --- CHECK FOR DUPLICATE EMAIL ---
-    try {
-      const existing = await getTicketByEmail(data.email);
-      if (existing) {
-        return NextResponse.json(
-          { message: "This email is already registered. Please use the Verify Ticket page to access your pass." },
-          { status: 409 }
-        );
-      }
-    } catch (e) {
-      console.error("Duplicate check failed:", e);
-      // Proceeding might be risky, but let's assume if sheet fails we might have larger issues
+    const existing = await getTicketByEmail(data.email);
+    if (existing) {
+      return NextResponse.json(
+        { message: "This email is already registered. Please use the Verify Ticket page to access your pass." },
+        { status: 409 }
+      );
     }
 
     const ticketId = `AT-${uuidv4().substring(0, 8).toUpperCase()}`;
 
-    console.log("Starting registration for:", data.email, "ticketId:", ticketId);
-    
-    // Primary sync to Google Sheets
-    try {
-      console.log("Attempting to append to Google Sheets...");
-      await appendToSheet({ ...data, ticketId });
-      console.log("Google Sheets append successful!");
-    } catch (e) {
-      console.error("Sheets sync failed:", e);
-      return NextResponse.json(
-        { message: "Registration failed due to server synchronization error." },
-        { status: 500 }
-      );
-    }
+    await appendToSheet({ ...data, ticketId });
 
-    // Secondary tasks (Email / PDF) can run in background
-    (async () => {
-      try {
-        const pdfBuffer = await generateTicketPdf(data, ticketId);
-        const emailHtml = generateTicketEmailHTML(data.fullName, ticketId);
-        
-        await sendEmail({
-          to: data.email,
-          subject: "Your Antorip Farewell Concert Entry Pass",
-          html: emailHtml,
-          attachments: [
-            {
-              filename: `ticket-${ticketId}.pdf`,
-              content: pdfBuffer,
-            },
-          ],
-        });
-        console.log("Confirmation email sent to:", data.email);
-      } catch (e) {
-        console.error("Email/PDF orchestration failed:", e);
-      }
-    })();
+    const pdfBuffer = await generateTicketPdf(data, ticketId);
+    const emailHtml = generateTicketEmailHTML(data.fullName, ticketId);
+    
+    await sendEmail({
+      to: data.email,
+      subject: "Your Antorip Farewell Concert Entry Pass",
+      html: emailHtml,
+      attachments: [
+        {
+          filename: `ticket-${ticketId}.pdf`,
+          content: pdfBuffer,
+        },
+      ],
+    });
 
     return NextResponse.json({
       message: "Registration successful",
       ticketId,
       email: data.email,
     });
-  } catch (error: any) {
-    console.error("Critical registration error:", error);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("Critical registration error:", message);
     return NextResponse.json(
       { message: "Critical error during registration" },
       { status: 500 }

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Download, Ticket, User, Mail, Phone, GraduationCap, CheckCircle, IdCard, Heart, UserCheck, Droplets, MapPin, Calendar, Copy, Check, Shield } from "lucide-react";
+import { Download, Ticket, User, Mail, Phone, GraduationCap, CheckCircle, IdCard, UserCheck, Droplets, MapPin, Calendar, Copy, Check, Shield } from "lucide-react";
 
 interface TicketData {
   ticketId: string;

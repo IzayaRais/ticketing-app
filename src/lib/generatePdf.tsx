@@ -1,5 +1,5 @@
 import React from "react";
-import { Document, Page, Text, View, StyleSheet, renderToBuffer, Font, Image } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, renderToBuffer, Image } from "@react-pdf/renderer";
 import QRCode from "qrcode";
 import { RegistrationData } from "./validations";
 
@@ -403,6 +403,7 @@ const TicketDocument = ({ data, ticketId, qrCodeUrl }: { data: RegistrationData;
           </View>
 
           <View style={styles.qrSection}>
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
             <Image src={qrCodeUrl} style={styles.qrImage} />
           </View>
           </View>

@@ -5,7 +5,7 @@ import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Shield, Clock, Ticket, Info, Loader2, Calendar, MapPin, Sparkles, CheckCircle, ArrowRight, Mail, User } from "lucide-react";
+import { Shield, Clock, Ticket, Info, Loader2, Calendar, MapPin, Sparkles, CheckCircle, ArrowRight, User } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import RegistrationForm from "@/components/RegistrationForm";
 import TicketCard from "@/components/TicketCard";
@@ -31,7 +31,7 @@ const sideFeatures = [
 function DashboardContent() {
   const { data: session, status } = useSession();
   const searchParams = useSearchParams();
-  const [existingTicket, setExistingTicket] = useState<any>(null);
+  const [existingTicket, setExistingTicket] = useState<{ ticketId: string; fullName: string; email: string; phone: string; studentId?: string; university: string; gender?: string; bloodGroup?: string; status: string; timestamp?: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -95,10 +95,6 @@ function DashboardContent() {
       </div>
     );
   }
-
-  const displayName = session?.user?.name || existingTicket?.fullName || "Guest";
-
-  const isVerifiedAccess = existingTicket && (!session || existingTicket.email === (session.user?.email || existingTicket.email));
 
   return (
     <>
@@ -286,7 +282,7 @@ function DashboardContent() {
                       <div className="flex justify-between items-center py-2">
                         <span className="text-xs font-bold text-slate-400 uppercase">Date</span>
                         <span className="text-sm font-bold text-slate-700">
-                          {new Date(existingTicket.timestamp).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+                          {new Date(String(existingTicket.timestamp)).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
                         </span>
                       </div>
                     )}

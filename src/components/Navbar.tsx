@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Ticket, Menu, X, LayoutDashboard, LogOut, User, CheckCircle, Shield } from "lucide-react";
+import { Ticket, Menu, X, LogOut, User } from "lucide-react";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -19,22 +19,14 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [verifiedEmail, setVerifiedEmail] = useState<string | null>(null);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handler);
-    
-    // Sync verification state from sessionStorage if session is null
-    if (!session) {
-      const email = sessionStorage.getItem("verifiedEmail");
-      setVerifiedEmail(email);
-    } else {
-      setVerifiedEmail(null);
-    }
-    
     return () => window.removeEventListener("scroll", handler);
-  }, [session]);
+  }, []);
+
+  const verifiedEmail = typeof window !== "undefined" && !session ? sessionStorage.getItem("verifiedEmail") : null;
 
   const handleSignOut = () => {
     sessionStorage.removeItem("verifiedEmail");
@@ -45,7 +37,6 @@ export default function Navbar() {
   const clearVerifiedSession = () => {
     sessionStorage.removeItem("verifiedEmail");
     sessionStorage.removeItem("verifiedId");
-    setVerifiedEmail(null);
     window.location.href = "/";
   };
 

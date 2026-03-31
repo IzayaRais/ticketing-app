@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import RegistrationForm from "@/components/RegistrationForm";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,7 +9,7 @@ import {
   Ticket, Calendar, MapPin, Users, ArrowRight,
   Music, Star, ShieldCheck, 
   Navigation, Compass, Map as MapIcon,
-  ChevronDown, Heart, Trophy, Globe, Briefcase,
+  ChevronDown,
   Mic2, Radio, Disc, Mail
 } from "lucide-react";
 
@@ -309,10 +310,10 @@ export default function LandingPage() {
             <div>
               <h4 className="text-sm font-black uppercase tracking-wider text-maroon-400 mb-6">Quick Links</h4>
               <ul className="space-y-3">
-                <li><a href="/" className="text-slate-400 hover:text-maroon-400 transition-colors text-sm">Home</a></li>
-                <li><a href="/dashboard" className="text-slate-400 hover:text-maroon-400 transition-colors text-sm">Register</a></li>
-                <li><a href="/verify" className="text-slate-400 hover:text-maroon-400 transition-colors text-sm">Verify Ticket</a></li>
-                <li><a href="/admin" className="text-slate-400 hover:text-maroon-400 transition-colors text-sm">Admin</a></li>
+                <li><Link href="/" className="text-slate-400 hover:text-maroon-400 transition-colors text-sm">Home</Link></li>
+                <li><Link href="/dashboard" className="text-slate-400 hover:text-maroon-400 transition-colors text-sm">Register</Link></li>
+                <li><Link href="/verify" className="text-slate-400 hover:text-maroon-400 transition-colors text-sm">Verify Ticket</Link></li>
+                <li><Link href="/admin" className="text-slate-400 hover:text-maroon-400 transition-colors text-sm">Admin</Link></li>
               </ul>
             </div>
             
@@ -340,7 +341,7 @@ export default function LandingPage() {
           <div className="border-t border-slate-800 py-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-slate-500 text-sm">
-                © 2026 Antorip Class '26. All rights reserved.
+                © 2026 Antorip Class &apos;26. All rights reserved.
               </p>
               <p className="text-slate-600 text-sm">
                 Developed by <a href="https://raisul-islam-ratul.vercel.app" target="_blank" rel="noopener noreferrer" className="text-maroon-400 hover:text-maroon-300 font-bold transition-colors">Raisul Islam Ratul</a>

@@ -1,4 +1,4 @@
-import { GoogleSpreadsheet } from "google-spreadsheet";
+import { GoogleSpreadsheet, GoogleSpreadsheetWorksheet } from "google-spreadsheet";
 import { JWT } from "google-auth-library";
 import { RegistrationData } from "./validations";
 import fs from "fs";
@@ -16,8 +16,7 @@ function getAuth() {
         key: credentials.private_key,
         scopes: ["https://www.googleapis.com/auth/spreadsheets"],
       });
-    } catch (e: any) {
-      console.error("❌ Failed to load credentials from JSON file:", e.message);
+    } catch {
     }
   }
 
@@ -48,7 +47,7 @@ async function getDoc() {
   return doc;
 }
 
-async function ensureHeaders(sheet: any) {
+async function ensureHeaders(sheet: GoogleSpreadsheetWorksheet) {
   try {
     await sheet.loadHeaderRow();
     const headers = sheet.headerValues;
@@ -58,7 +57,7 @@ async function ensureHeaders(sheet: any) {
         "phone", "studentId", "university", "gender", "bloodGroup", "status"
       ]);
     }
-  } catch (e) {
+  } catch {
     await sheet.setHeaderRow([
       "timestamp", "ticketId", "fullName", "email",
       "phone", "studentId", "university", "gender", "tshirtSize", "bloodGroup", "status"
@@ -86,8 +85,9 @@ export async function appendToSheet(data: RegistrationData & { ticketId: string 
     });
 
     console.log("✅ Google Sheets row appended:", data.ticketId);
-  } catch (error: any) {
-    console.error("❌ Google Sheets append failed:", error.message);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("❌ Google Sheets append failed:", message);
     throw error;
   }
 }
@@ -98,7 +98,7 @@ export async function getTicketById(ticketId: string) {
     const sheet = doc.sheetsByIndex[0];
     const rows = await sheet.getRows();
 
-    const row = rows.find((r: any) => r.get("ticketId") === ticketId);
+    const row = rows.find((r) => r.get("ticketId") === ticketId);
     if (!row) return null;
 
     return {
@@ -113,8 +113,9 @@ export async function getTicketById(ticketId: string) {
       status: row.get("status"),
       timestamp: row.get("timestamp"),
     };
-  } catch (error: any) {
-    console.error("❌ Google Sheets fetch failed:", error.message);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("❌ Google Sheets fetch failed:", message);
     throw error;
   }
 }
@@ -125,7 +126,7 @@ export async function getTicketByEmail(email: string) {
     const sheet = doc.sheetsByIndex[0];
     const rows = await sheet.getRows();
 
-    const row = rows.find((r: any) => r.get("email") === email);
+    const row = rows.find((r) => r.get("email") === email);
     if (!row) return null;
 
     return {
@@ -140,8 +141,9 @@ export async function getTicketByEmail(email: string) {
       status: row.get("status"),
       timestamp: row.get("timestamp"),
     };
-  } catch (error: any) {
-    console.error("❌ Google Sheets fetch by email failed:", error.message);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("❌ Google Sheets fetch by email failed:", message);
     throw error;
   }
 }
@@ -152,7 +154,7 @@ export async function getAllTickets() {
     const sheet = doc.sheetsByIndex[0];
     const rows = await sheet.getRows();
 
-    return rows.map((r: any) => ({
+    return rows.map((r) => ({
       ticketId: r.get("ticketId"),
       fullName: r.get("fullName"),
       email: r.get("email"),
@@ -164,8 +166,9 @@ export async function getAllTickets() {
       status: r.get("status"),
       timestamp: r.get("timestamp"),
     }));
-  } catch (error: any) {
-    console.error("❌ Google Sheets fetch all failed:", error.message);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("❌ Google Sheets fetch all failed:", message);
     throw error;
   }
 }

@@ -39,6 +39,7 @@ export const authOptions: NextAuthOptions = {
           id: credentials.ticketId,
           email: credentials.email,
           name: "Premium Member",
+          role: "user" as const,
         };
       },
     }),
@@ -50,7 +51,7 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         const email = user.email?.toLowerCase();
-        (user as any).role = email === ADMIN_EMAIL.toLowerCase() ? "admin" : "user";
+        user.role = email === ADMIN_EMAIL.toLowerCase() ? "admin" : "user";
       }
       return true;
     },
@@ -68,8 +69,8 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).id = token.id;
-        (session.user as any).role = token.role;
+        session.user.id = token.id;
+        session.user.role = token.role;
       }
       return session;
     },

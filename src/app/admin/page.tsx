@@ -6,10 +6,10 @@ import { signIn, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Users, UserCheck, UserX, Download, Search, 
-  ArrowUpDown, Loader2, Ticket, GraduationCap, Droplets,
-  Menu, X, ChevronDown, Shield, LogOut, Bell, Settings,
-  TrendingUp, Calendar, Mail, Phone, Filter, RefreshCw
+  ArrowUpDown, Ticket, GraduationCap, Droplets,
+  ChevronDown, Shield, LogOut, Filter, RefreshCw
 } from "lucide-react";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 
 type SortField = "fullName" | "email" | "university" | "timestamp" | "gender";
@@ -50,14 +50,13 @@ export default function AdminDashboard() {
   const [universityFilter, setUniversityFilter] = useState<string>("all");
   const [bloodGroupFilter, setBloodGroupFilter] = useState<string>("all");
   const [dateFilter, setDateFilter] = useState<string>("all");
-  const [stats, setStats] = useState<any>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [stats, setStats] = useState<{ total: number; male: number; female: number; other: number; stats: { byUniversity: Record<string, number>; byBloodGroup: Record<string, number> } } | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilterCount, setActiveFilterCount] = useState(0);
 
   useEffect(() => {
     if (status === "authenticated") {
-      const userRole = (session?.user as any)?.role;
+      const userRole = session?.user?.role;
       if (userRole !== "admin") {
         setLoading(false);
         return;
@@ -254,7 +253,7 @@ export default function AdminDashboard() {
     );
   }
 
-  if (status === "authenticated" && (session?.user as any)?.role !== "admin") {
+  if (status === "authenticated" && session?.user?.role !== "admin") {
     return (
       <main className="min-h-screen bg-slate-50">
         <Navbar />
@@ -271,14 +270,14 @@ export default function AdminDashboard() {
             <p className="text-slate-500 mb-2 font-medium">
               {session?.user?.email}
             </p>
-            <p className="text-slate-400 mb-8">You don't have permission to access this area</p>
+            <p className="text-slate-400 mb-8">              You don&apos;t have permission to access this area</p>
             <div className="flex gap-3 justify-center">
-              <a 
-                href="/" 
-                className="px-6 py-3 rounded-xl font-bold border-2 border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50 transition-all"
-              >
-                Go Home
-              </a>
+                <Link 
+                  href="/" 
+                  className="px-6 py-3 rounded-xl font-bold border-2 border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50 transition-all"
+                >
+                  Go Home
+                </Link>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
                 className="px-6 py-3 rounded-xl font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-all flex items-center gap-2"
@@ -366,7 +365,7 @@ export default function AdminDashboard() {
             {Object.entries(stats?.stats?.byUniversity || {}).length === 0 ? (
               <p className="text-slate-400 text-sm">No university data available</p>
             ) : (
-              Object.entries(stats?.stats?.byUniversity || {}).map(([uni, count]: [string, any]) => (
+              Object.entries(stats?.stats?.byUniversity || {}).map(([uni, count]) => (
                 <div 
                   key={uni} 
                   className="px-3 py-1.5 bg-gradient-to-r from-maroon-50 to-slate-50 border border-slate-100 rounded-lg flex items-center gap-2 hover:shadow-md transition-shadow cursor-pointer"

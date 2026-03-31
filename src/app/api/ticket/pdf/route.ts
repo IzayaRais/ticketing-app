@@ -40,8 +40,9 @@ export async function GET(request: Request) {
         "Content-Disposition": `attachment; filename="ticket-${id}.pdf"`,
       },
     });
-  } catch (error: any) {
-    console.error("PDF download API error:", error);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("PDF download API error:", message);
     return NextResponse.json(
       { message: "Failed to generate ticket PDF" },
       { status: 500 }

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Ticket, Mail, ArrowRight, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Ticket, Mail, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 
 export default function VerifyPage() {
@@ -32,7 +32,7 @@ export default function VerifyPage() {
       } else {
         setError(data.message || "Invalid Email or Ticket ID combination.");
       }
-    } catch (err) {
+    } catch {
       setError("An error occurred while verifying. Please try again.");
     } finally {
       setIsVerifying(false);

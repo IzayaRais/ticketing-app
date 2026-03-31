@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   CheckCircle2, Ticket, Mail, Download,
-  Home, Share2, Loader2, Copy, Check
+  Home, Loader2, Copy, Check
 } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";

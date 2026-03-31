@@ -21,7 +21,7 @@ interface EmailOptions {
   to: string;
   subject: string;
   html: string;
-  attachments?: any[];
+  attachments?: Array<{ filename: string; content: Buffer }>;
 }
 
 export async function sendEmail({ to, subject, html, attachments }: EmailOptions) {

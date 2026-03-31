@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { JWT } from "google-auth-library";
 import fs from "fs";
+import type { AttendeeRow } from "@/types/attendee";
 
 const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID;
 
@@ -15,7 +18,9 @@ function getAuth() {
         key: credentials.private_key,
         scopes: ["https://www.googleapis.com/auth/spreadsheets"],
       });
-    } catch (e) {}
+    } catch {
+      // fall through to env var auth
+    }
   }
   const email = process.env.GOOGLE_CLIENT_EMAIL;
   let key = process.env.GOOGLE_PRIVATE_KEY || "";
@@ -25,14 +30,10 @@ function getAuth() {
   return new JWT({ email, key, scopes: ["https://www.googleapis.com/auth/spreadsheets"] });
 }
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const email = searchParams.get("email");
-  const pass = searchParams.get("pass");
-
-  // Verified admin credentials
-  if (email !== "admin@antorip.com" || pass !== "antorip123") {
-    return NextResponse.json({ error: "Unauthorized access: Invalid Credentials" }, { status: 401 });
+export async function GET() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user || session.user.role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
@@ -42,7 +43,7 @@ export async function GET(request: Request) {
     const sheet = doc.sheetsByIndex[0];
     const rows = await sheet.getRows();
 
-    const attendees = rows.map((row: any) => ({
+    const attendees: AttendeeRow[] = rows.map((row) => ({
       ticketId: row.get("ticketId"),
       fullName: row.get("fullName"),
       email: row.get("email"),
@@ -56,8 +57,9 @@ export async function GET(request: Request) {
     }));
 
     return NextResponse.json({ attendees });
-  } catch (error: any) {
-    console.error("Admin fetch failed:", error.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("Admin fetch failed:", message);
     return NextResponse.json({ error: "Failed to fetch data from spreadsheet" }, { status: 500 });
   }
 }

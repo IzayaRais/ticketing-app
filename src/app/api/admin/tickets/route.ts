@@ -26,6 +26,8 @@ export async function GET() {
     let maleCount = 0;
     let femaleCount = 0;
     let otherCount = 0;
+    let scannedCount = 0;
+    let notScannedCount = 0;
 
     const universityStats: Record<string, number> = {};
     const bloodGroupStats: Record<string, number> = {};
@@ -35,6 +37,9 @@ export async function GET() {
       if (ticket.gender === "Male") maleCount++;
       else if (ticket.gender === "Female") femaleCount++;
       else if (ticket.gender) otherCount++;
+
+      if (ticket.checkedIn === "true") scannedCount++;
+      else notScannedCount++;
 
       if (ticket.university) {
         universityStats[ticket.university] = (universityStats[ticket.university] || 0) + 1;
@@ -49,6 +54,8 @@ export async function GET() {
       male: maleCount,
       female: femaleCount,
       other: otherCount,
+      scanned: scannedCount,
+      notScanned: notScannedCount,
       tickets: tickets.toReversed(),
       stats: {
         byUniversity: universityStats,

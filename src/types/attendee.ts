@@ -9,4 +9,6 @@ export interface AttendeeRow {
   bloodGroup: string;
   status: string;
   timestamp: string;
+  checkedIn: string;
+  checkedInAt: string;
 }

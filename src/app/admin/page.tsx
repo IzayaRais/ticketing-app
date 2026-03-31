@@ -26,6 +26,8 @@ interface Ticket {
   bloodGroup: string;
   status: string;
   timestamp: string;
+  checkedIn: string;
+  checkedInAt: string;
 }
 
 const universities = ["MIST", "BUP", "AFMC"];
@@ -50,7 +52,7 @@ export default function AdminDashboard() {
   const [universityFilter, setUniversityFilter] = useState<string>("all");
   const [bloodGroupFilter, setBloodGroupFilter] = useState<string>("all");
   const [dateFilter, setDateFilter] = useState<string>("all");
-  const [stats, setStats] = useState<{ total: number; male: number; female: number; other: number; stats: { byUniversity: Record<string, number>; byBloodGroup: Record<string, number> } } | null>(null);
+  const [stats, setStats] = useState<{ total: number; male: number; female: number; other: number; scanned: number; notScanned: number; stats: { byUniversity: Record<string, number>; byBloodGroup: Record<string, number> } } | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilterCount, setActiveFilterCount] = useState(0);
 
@@ -178,6 +180,20 @@ export default function AdminDashboard() {
       icon: <Ticket className="w-6 h-6" />, 
       color: "text-maroon-700",
       bgColor: "bg-maroon-700/10"
+    },
+    { 
+      label: "Scanned In", 
+      value: stats?.scanned || 0, 
+      icon: <UserCheck className="w-6 h-6" />, 
+      color: "text-green-600",
+      bgColor: "bg-green-50"
+    },
+    { 
+      label: "Not Yet Scanned", 
+      value: stats?.notScanned || 0, 
+      icon: <Users className="w-6 h-6" />, 
+      color: "text-amber-600",
+      bgColor: "bg-amber-50"
     },
     { 
       label: "Male", 

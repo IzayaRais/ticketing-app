@@ -77,7 +77,7 @@ export default function ScanPage() {
           fullName: data.fullName,
           email: data.email,
           university: data.university,
-          message: "Entry approved — status saved to Google Sheets",
+          message: "Entry approved",
         });
       }
     } catch {

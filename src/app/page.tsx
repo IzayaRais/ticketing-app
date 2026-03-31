@@ -46,12 +46,12 @@ function CountdownTimer() {
     <div className="flex gap-3">
       {units.map((unit) => (
         <div key={unit.label} className="text-center">
-          <div className="w-16 h-16 md:w-20 md:h-20 bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl flex items-center justify-center mb-2">
-            <span className="text-2xl md:text-3xl font-black text-white tabular-nums">
+          <div className="w-16 h-16 md:w-20 md:h-20 bg-maroon-700/5 border border-maroon-700/10 rounded-2xl flex items-center justify-center mb-2">
+            <span className="text-2xl md:text-3xl font-black text-maroon-700 tabular-nums">
               {String(unit.value).padStart(2, "0")}
             </span>
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/50">{unit.label}</span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">{unit.label}</span>
         </div>
       ))}
     </div>

@@ -43,7 +43,7 @@ function SelectField({
   }, []);
 
   return (
-    <div className="relative" ref={ref}>
+    <div className={`relative ${open ? "z-50" : "z-auto"}`} ref={ref}>
       <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1.5">
         {label}
       </label>

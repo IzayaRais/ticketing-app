@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import {
   QrCode, CheckCircle2, XCircle, AlertTriangle,
-  ArrowLeft, Loader2, User, Mail, GraduationCap, Clock, Camera, CameraOff
+  ArrowLeft, Loader2, User, Mail, GraduationCap, Clock, Camera, CameraOff, History
 } from "lucide-react";
 import Link from "next/link";
 
@@ -20,6 +20,13 @@ type ScanResult = null | {
   message: string;
 };
 
+type ScanHistoryEntry = {
+  ticketId: string;
+  fullName: string;
+  type: "success" | "duplicate" | "error";
+  timestamp: string;
+};
+
 export default function ScanPage() {
   const { data: session, status } = useSession();
   const [result, setResult] = useState<ScanResult>(null);
@@ -30,6 +37,7 @@ export default function ScanPage() {
   const [selectedCamera, setSelectedCamera] = useState("");
   const [manualId, setManualId] = useState("");
   const [showManual, setShowManual] = useState(false);
+  const [scanHistory, setScanHistory] = useState<ScanHistoryEntry[]>([]);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const lastScanRef = useRef("");
 
@@ -47,7 +55,7 @@ export default function ScanPage() {
 
     setProcessing(true);
     lastScanRef.current = finalId;
-    setTimeout(() => { lastScanRef.current = ""; }, 3000);
+    setTimeout(() => { lastScanRef.current = ""; }, 5000);
 
     try {
       const res = await fetch("/api/ticket/checkin", {
@@ -60,7 +68,15 @@ export default function ScanPage() {
 
       if (!res.ok) {
         setResult({ type: "error", ticketId: finalId, message: data.message || "Check-in failed" });
+        setScanHistory(prev => [{ ticketId: finalId, fullName: "Unknown", type: "error", timestamp: new Date().toLocaleTimeString() }, ...prev].slice(0, 20));
       } else if (data.alreadyCheckedIn) {
+        const entry = {
+          ticketId: finalId,
+          fullName: data.fullName || "Unknown",
+          type: "duplicate" as const,
+          timestamp: new Date().toLocaleTimeString(),
+        };
+        setScanHistory(prev => [entry, ...prev].slice(0, 20));
         setResult({
           type: "duplicate",
           ticketId: finalId,
@@ -68,9 +84,16 @@ export default function ScanPage() {
           email: data.email,
           university: data.university,
           checkedInAt: data.checkedInAt,
-          message: `Already checked in at ${new Date(data.checkedInAt).toLocaleTimeString()}`,
+          message: `ALREADY SCANNED — Checked in at ${new Date(data.checkedInAt).toLocaleTimeString()}`,
         });
       } else {
+        const entry = {
+          ticketId: finalId,
+          fullName: data.fullName || "Unknown",
+          type: "success" as const,
+          timestamp: new Date().toLocaleTimeString(),
+        };
+        setScanHistory(prev => [entry, ...prev].slice(0, 20));
         setResult({
           type: "success",
           ticketId: finalId,
@@ -82,6 +105,7 @@ export default function ScanPage() {
       }
     } catch {
       setResult({ type: "error", ticketId: finalId, message: "Network error. Check connection." });
+      setScanHistory(prev => [{ ticketId: finalId, fullName: "Unknown", type: "error", timestamp: new Date().toLocaleTimeString() }, ...prev].slice(0, 20));
     }
 
     setProcessing(false);
@@ -340,7 +364,7 @@ export default function ScanPage() {
                   result.type === "duplicate" ? "text-amber-800" : "text-red-800"
                 }`}>
                   {result.type === "success" ? "Entry Approved" :
-                   result.type === "duplicate" ? "Duplicate Entry" : "Invalid Ticket"}
+                   result.type === "duplicate" ? "ALREADY SCANNED" : "Invalid Ticket"}
                 </h3>
                 <p className={`text-sm mt-0.5 ${
                   result.type === "success" ? "text-green-600" :
@@ -375,6 +399,41 @@ export default function ScanPage() {
                   </div>
                 )}
               </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Scan History */}
+        {scanHistory.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-6 bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
+              <History className="w-5 h-5 text-slate-400" />
+              <h3 className="font-bold text-slate-800">Recent Scans ({scanHistory.length})</h3>
+            </div>
+            <div className="max-h-64 overflow-y-auto">
+              {scanHistory.map((entry, i) => (
+                <div key={`${entry.ticketId}-${i}`} className={`px-6 py-3 flex items-center gap-3 ${i !== scanHistory.length - 1 ? "border-b border-slate-50" : ""} ${
+                  entry.type === "success" ? "bg-green-50/50" :
+                  entry.type === "duplicate" ? "bg-amber-50/50" :
+                  "bg-red-50/50"
+                }`}>
+                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                    entry.type === "success" ? "bg-green-500" :
+                    entry.type === "duplicate" ? "bg-amber-500" :
+                    "bg-red-500"
+                  }`} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs font-bold text-slate-700">{entry.ticketId}</span>
+                      <span className="text-xs text-slate-400">{entry.timestamp}</span>
+                    </div>
+                    <p className="text-xs text-slate-500 truncate">{entry.fullName} {entry.type === "duplicate" && "— Already scanned"}</p>
+                  </div>
+                  {entry.type === "success" ? <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" /> :
+                   entry.type === "duplicate" ? <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" /> :
+                   <XCircle className="w-4 h-4 text-red-500 flex-shrink-0" />}
+                </div>
+              ))}
             </div>
           </motion.div>
         )}

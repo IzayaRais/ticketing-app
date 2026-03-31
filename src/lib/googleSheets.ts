@@ -11,13 +11,14 @@ function getAuth() {
   if (keyPath) {
     try {
       const credentials = JSON.parse(fs.readFileSync(keyPath, "utf-8"));
-      return new JWT({
-        email: credentials.client_email,
-        key: credentials.private_key,
-        scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-      });
-    } catch {
-    }
+    return new JWT({
+      email: credentials.client_email,
+      key: credentials.private_key,
+      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    });
+  } catch {
+    // Fall through to env-based auth
+  }
   }
 
   const email = process.env.GOOGLE_CLIENT_EMAIL;
@@ -83,11 +84,7 @@ export async function appendToSheet(data: RegistrationData & { ticketId: string 
       bloodGroup: data.bloodGroup,
       status: "Verified",
     });
-
-    console.log("✅ Google Sheets row appended:", data.ticketId);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    console.error("❌ Google Sheets append failed:", message);
     throw error;
   }
 }
@@ -96,9 +93,13 @@ export async function getTicketById(ticketId: string) {
   try {
     const doc = await getDoc();
     const sheet = doc.sheetsByIndex[0];
+    await ensureHeaders(sheet);
     const rows = await sheet.getRows();
 
-    const row = rows.find((r) => r.get("ticketId") === ticketId);
+    const row = rows.find((r) => {
+      const val = r.get("ticketId");
+      return val && val.trim().toUpperCase() === ticketId.trim().toUpperCase();
+    });
     if (!row) return null;
 
     return {
@@ -112,10 +113,10 @@ export async function getTicketById(ticketId: string) {
       bloodGroup: row.get("bloodGroup"),
       status: row.get("status"),
       timestamp: row.get("timestamp"),
+      checkedIn: row.get("checkedIn") || "",
+      checkedInAt: row.get("checkedInAt") || "",
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    console.error("❌ Google Sheets fetch failed:", message);
     throw error;
   }
 }
@@ -142,8 +143,6 @@ export async function getTicketByEmail(email: string) {
       timestamp: row.get("timestamp"),
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    console.error("❌ Google Sheets fetch by email failed:", message);
     throw error;
   }
 }
@@ -175,6 +174,38 @@ export async function getAllTickets() {
   }
 }
 
+export async function logScanAttempt(ticketId: string, result: "success" | "duplicate" | "not_found" | "error", details?: string) {
+  try {
+    const doc = await getDoc();
+    let sheet = doc.sheetsByIndex[1] || doc.sheetsByIndex[0];
+
+    // Try to find or create a "Scan Log" sheet
+    try {
+      sheet = doc.sheetsByIndex[1];
+      if (!sheet) {
+        sheet = await doc.addSheet({ title: "Scan Log" });
+      }
+    } catch {
+      // Use first sheet if second doesn't exist
+      sheet = doc.sheetsByIndex[0];
+    }
+
+    await sheet.loadHeaderRow().catch(async () => {
+      await sheet.setHeaderRow(["timestamp", "ticketId", "result", "details"]);
+    });
+
+    await sheet.addRow({
+      timestamp: new Date().toISOString(),
+      ticketId,
+      result,
+      details: details || "",
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("❌ Scan log failed:", message);
+  }
+}
+
 export async function markTicketCheckedIn(ticketId: string) {
   try {
     const doc = await getDoc();
@@ -200,11 +231,13 @@ export async function markTicketCheckedIn(ticketId: string) {
 
     if (!row) {
       console.error("❌ Ticket not found:", ticketId);
+      await logScanAttempt(ticketId, "not_found", "Ticket ID not found in sheet");
       return { found: false };
     }
 
     const alreadyChecked = row.get("checkedIn") === "true";
     if (alreadyChecked) {
+      await logScanAttempt(ticketId, "duplicate", `Already checked in at ${row.get("checkedInAt") || "unknown time"}`);
       return {
         found: true,
         alreadyCheckedIn: true,
@@ -219,6 +252,7 @@ export async function markTicketCheckedIn(ticketId: string) {
     row.set("checkedInAt", new Date().toISOString());
     await row.save();
 
+    await logScanAttempt(ticketId, "success", `Checked in: ${row.get("fullName")}`);
     console.log("✅ Checked in:", ticketId, row.get("fullName"));
 
     return {

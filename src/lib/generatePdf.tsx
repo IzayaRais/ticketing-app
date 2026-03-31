@@ -433,7 +433,7 @@ const TicketDocument = ({ data, ticketId, qrCodeUrl }: { data: RegistrationData;
 
 export async function generateTicketPdf(data: RegistrationData, ticketId: string) {
   try {
-    const qrData = `${ticketId}|${data.fullName}`;
+    const qrData = ticketId;
     const qrCodeUrl = await QRCode.toDataURL(qrData, { width: 200, margin: 1 });
     const buffer = await renderToBuffer(<TicketDocument data={data} ticketId={ticketId} qrCodeUrl={qrCodeUrl} />);
     return buffer;

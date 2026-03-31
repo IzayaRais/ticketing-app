@@ -179,10 +179,29 @@ export async function markTicketCheckedIn(ticketId: string) {
   try {
     const doc = await getDoc();
     const sheet = doc.sheetsByIndex[0];
+
+    await sheet.loadHeaderRow();
+    const headers = [...sheet.headerValues];
+    const missingCols: string[] = [];
+    if (!headers.includes("checkedIn")) missingCols.push("checkedIn");
+    if (!headers.includes("checkedInAt")) missingCols.push("checkedInAt");
+
+    if (missingCols.length > 0) {
+      await sheet.setHeaderRow([...headers, ...missingCols]);
+      console.log("✅ Added check-in columns:", missingCols.join(", "));
+    }
+
     const rows = await sheet.getRows();
 
-    const row = rows.find((r) => r.get("ticketId") === ticketId);
-    if (!row) return { found: false };
+    const row = rows.find((r) => {
+      const val = r.get("ticketId");
+      return val && val.trim().toUpperCase() === ticketId.trim().toUpperCase();
+    });
+
+    if (!row) {
+      console.error("❌ Ticket not found:", ticketId);
+      return { found: false };
+    }
 
     const alreadyChecked = row.get("checkedIn") === "true";
     if (alreadyChecked) {
@@ -199,6 +218,8 @@ export async function markTicketCheckedIn(ticketId: string) {
     row.set("checkedIn", "true");
     row.set("checkedInAt", new Date().toISOString());
     await row.save();
+
+    console.log("✅ Checked in:", ticketId, row.get("fullName"));
 
     return {
       found: true,

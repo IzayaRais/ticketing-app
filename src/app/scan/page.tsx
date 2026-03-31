@@ -28,65 +28,78 @@ export default function ScanPage() {
   const [cameraReady, setCameraReady] = useState(false);
   const [cameras, setCameras] = useState<{ id: string; label: string }[]>([]);
   const [selectedCamera, setSelectedCamera] = useState("");
+  const [manualId, setManualId] = useState("");
+  const [showManual, setShowManual] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const lastScanRef = useRef("");
 
-  const handleScan = useCallback(async (decodedText: string) => {
+  const processTicket = useCallback(async (ticketId: string) => {
     if (processing) return;
-    if (decodedText === lastScanRef.current) return;
 
-    lastScanRef.current = decodedText;
-    setProcessing(true);
+    const cleanId = ticketId.trim().toUpperCase();
+    const match = cleanId.match(/AT-[A-Z0-9]{8}/);
+    const finalId = match ? match[0] : cleanId;
 
-    setTimeout(() => { lastScanRef.current = ""; }, 3000);
-
-    const ticketId = decodedText.startsWith("AT-")
-      ? decodedText
-      : decodedText.match(/AT-[A-Z0-9]{8}/)?.[0];
-
-    if (!ticketId) {
-      setResult({ type: "error", ticketId: decodedText, message: "Invalid ticket format" });
-      setProcessing(false);
+    if (!finalId || !/AT-[A-Z0-9]{8}/.test(finalId)) {
+      setResult({ type: "error", ticketId, message: `Invalid ticket format: "${ticketId}". Expected format: AT-XXXXXXXX` });
       return;
     }
+
+    setProcessing(true);
+    lastScanRef.current = finalId;
+    setTimeout(() => { lastScanRef.current = ""; }, 3000);
 
     try {
       const res = await fetch("/api/ticket/checkin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ticketId }),
+        body: JSON.stringify({ ticketId: finalId }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setResult({ type: "error", ticketId, message: data.message || "Check-in failed" });
+        setResult({ type: "error", ticketId: finalId, message: data.message || "Check-in failed" });
       } else if (data.alreadyCheckedIn) {
         setResult({
           type: "duplicate",
-          ticketId,
+          ticketId: finalId,
           fullName: data.fullName,
           email: data.email,
           university: data.university,
           checkedInAt: data.checkedInAt,
-          message: "Already checked in",
+          message: `Already checked in at ${new Date(data.checkedInAt).toLocaleTimeString()}`,
         });
       } else {
         setResult({
           type: "success",
-          ticketId,
+          ticketId: finalId,
           fullName: data.fullName,
           email: data.email,
           university: data.university,
-          message: "Entry approved",
+          message: "Entry approved — status saved to Google Sheets",
         });
       }
     } catch {
-      setResult({ type: "error", ticketId, message: "Network error. Check connection." });
+      setResult({ type: "error", ticketId: finalId, message: "Network error. Check connection." });
     }
 
     setProcessing(false);
   }, [processing]);
+
+  const handleScan = useCallback(async (decodedText: string) => {
+    if (processing) return;
+    if (decodedText === lastScanRef.current) return;
+
+    await processTicket(decodedText);
+  }, [processing, processTicket]);
+
+  const handleManualSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualId.trim()) return;
+    await processTicket(manualId.trim());
+    setManualId("");
+  };
 
   useEffect(() => {
     if (status !== "authenticated" || session?.user?.role !== "admin") return;
@@ -255,6 +268,48 @@ export default function ScanPage() {
             </div>
           )}
         </div>
+
+        {/* Manual entry toggle */}
+        <div className="mt-4 text-center">
+          <button
+            type="button"
+            onClick={() => setShowManual(!showManual)}
+            className="text-sm text-slate-400 hover:text-maroon-700 font-medium transition-colors"
+          >
+            {showManual ? "Hide manual entry" : "Or enter ticket ID manually"}
+          </button>
+        </div>
+
+        {/* Manual entry form */}
+        {showManual && (
+          <motion.form
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            onSubmit={handleManualSubmit}
+            className="mt-4 bg-white rounded-2xl shadow-lg border border-slate-100 p-6"
+          >
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1.5">
+              Ticket ID
+            </label>
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={manualId}
+                onChange={(e) => setManualId(e.target.value.toUpperCase())}
+                placeholder="AT-XXXXXXXX"
+                className="flex-1 px-4 py-3 rounded-xl border border-slate-200/80 text-sm font-mono font-medium text-slate-800 placeholder:text-slate-300 outline-none focus:border-maroon-700 focus:ring-4 focus:ring-maroon-700/8"
+                autoFocus
+              />
+              <button
+                type="submit"
+                disabled={processing || !manualId.trim()}
+                className="px-6 py-3 bg-maroon-700 text-white rounded-xl font-semibold text-sm hover:bg-maroon-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Check In
+              </button>
+            </div>
+          </motion.form>
+        )}
 
         {processing && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-6 bg-white rounded-2xl shadow-lg border border-slate-100 p-8 text-center">

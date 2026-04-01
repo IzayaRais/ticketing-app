@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Users, UserCheck, UserX, Download, Search, 
   ArrowUpDown, Ticket, GraduationCap, Droplets,
-  ChevronDown, Shield, LogOut, Filter, RefreshCw, QrCode
+  ChevronDown, Shield, LogOut, Filter, RefreshCw, QrCode, CheckCircle2, Clock
 } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -52,6 +52,7 @@ export default function AdminDashboard() {
   const [universityFilter, setUniversityFilter] = useState<string>("all");
   const [bloodGroupFilter, setBloodGroupFilter] = useState<string>("all");
   const [dateFilter, setDateFilter] = useState<string>("all");
+  const [scanStatusFilter, setScanStatusFilter] = useState<string>("all");
   const [stats, setStats] = useState<{ total: number; male: number; female: number; other: number; scanned: number; notScanned: number; stats: { byUniversity: Record<string, number>; byBloodGroup: Record<string, number> } } | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilterCount, setActiveFilterCount] = useState(0);
@@ -75,14 +76,16 @@ export default function AdminDashboard() {
     if (universityFilter !== "all") count++;
     if (bloodGroupFilter !== "all") count++;
     if (dateFilter !== "all") count++;
+    if (scanStatusFilter !== "all") count++;
     setActiveFilterCount(count);
-  }, [genderFilter, universityFilter, bloodGroupFilter, dateFilter]);
+  }, [genderFilter, universityFilter, bloodGroupFilter, dateFilter, scanStatusFilter]);
 
   const clearAllFilters = () => {
     setGenderFilter("all");
     setUniversityFilter("all");
     setBloodGroupFilter("all");
     setDateFilter("all");
+    setScanStatusFilter("all");
     setSearch("");
   };
 
@@ -120,6 +123,11 @@ export default function AdminDashboard() {
       const matchesUniversity = universityFilter === "all" || t.university === universityFilter;
       const matchesBloodGroup = bloodGroupFilter === "all" || t.bloodGroup === bloodGroupFilter;
       
+      const isScanned = t.checkedIn === "true";
+      const matchesScanStatus = scanStatusFilter === "all" || 
+        (scanStatusFilter === "scanned" && isScanned) || 
+        (scanStatusFilter === "notScanned" && !isScanned);
+      
       let matchesDate = true;
       if (dateFilter !== "all") {
         const ticketDate = new Date(t.timestamp);
@@ -141,7 +149,7 @@ export default function AdminDashboard() {
         }
       }
       
-      return matchesSearch && matchesGender && matchesUniversity && matchesBloodGroup && matchesDate;
+      return matchesSearch && matchesGender && matchesUniversity && matchesBloodGroup && matchesDate && matchesScanStatus;
     })
     .sort((a, b) => {
       let aVal: string | number = a[sortField] as string;
@@ -522,6 +530,23 @@ export default function AdminDashboard() {
                         </select>
                       </div>
                       
+                      <div className="flex flex-wrap gap-2 items-center">
+                        <span className="text-sm text-slate-500 font-medium py-1">Scan Status:</span>
+                        {["all", "scanned", "notScanned"].map((status) => (
+                          <button
+                            key={status}
+                            onClick={() => setScanStatusFilter(status)}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                              scanStatusFilter === status
+                                ? "bg-maroon-700 text-white"
+                                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                            }`}
+                          >
+                            {status === "all" ? "All" : status === "scanned" ? "✓ Scanned" : "○ Not Scanned"}
+                          </button>
+                        ))}
+                      </div>
+                      
                       {activeFilterCount > 0 && (
                         <button
                           onClick={clearAllFilters}
@@ -592,12 +617,17 @@ export default function AdminDashboard() {
                       <SortIcon field="timestamp" />
                     </button>
                   </th>
+                  <th className="px-4 py-3 text-left">
+                    <span className="flex items-center gap-1 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                      Status
+                    </span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredTickets.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-16 text-center">
+                    <td colSpan={7} className="px-6 py-16 text-center">
                       <div className="flex flex-col items-center gap-2">
                         <Users className="w-12 h-12 text-slate-200" />
                         <p className="text-slate-400 font-medium">No registrations found</p>
@@ -640,15 +670,28 @@ export default function AdminDashboard() {
                       <td className="px-4 py-3 hidden lg:table-cell">
                         <span className="text-sm font-bold text-red-600">{ticket.bloodGroup}</span>
                       </td>
-                      <td className="px-4 py-3">
-                        <p className="text-xs text-slate-400">
-                          {new Date(ticket.timestamp).toLocaleDateString("en-GB", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </p>
-                      </td>
+                  <td className="px-4 py-3">
+                    <p className="text-xs text-slate-400">
+                      {new Date(ticket.timestamp).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </p>
+                  </td>
+                  <td className="px-4 py-3">
+                    {ticket.checkedIn === "true" ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 rounded-lg text-xs font-bold border border-green-200">
+                        <CheckCircle2 className="w-3 h-3" />
+                        Scanned
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-bold border border-amber-200">
+                        <Clock className="w-3 h-3" />
+                        Pending
+                      </span>
+                    )}
+                  </td>
                     </motion.tr>
                   ))
                 )}

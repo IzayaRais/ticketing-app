@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 const bloodGroups = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"] as const;
-const genders = ["Male", "Female", "Other"] as const;
+const genders = ["Male", "Female"] as const;
 
 function SelectField({
   label,
@@ -218,7 +218,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
           <SelectField
             label="Gender"
             value={getValues("gender") || ""}
-            onChange={(val) => setValue("gender", val as "Male" | "Female" | "Other", { shouldValidate: true })}
+            onChange={(val) => setValue("gender", val as "Male" | "Female", { shouldValidate: true })}
             options={genders}
             placeholder="Select gender"
             error={errors.gender?.message}

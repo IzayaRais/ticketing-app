@@ -19,7 +19,7 @@ export const registrationSchema = z.object({
     .string()
     .regex(/^[A-Za-z0-9]{5,15}$/, "Student ID must be 5-15 alphanumeric characters"),
   university: z.enum(institutes, { message: "Please select your institute" }),
-  gender: z.enum(["Male", "Female", "Other"], { message: "Please select your gender" }),
+  gender: z.enum(["Male", "Female"], { message: "Please select your gender" }),
   bloodGroup: z.string().min(1, "Please select your blood group"),
   terms: z.boolean().refine((val) => val === true, {
     message: "You must agree to the terms and conditions",

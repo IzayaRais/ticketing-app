@@ -217,13 +217,6 @@ export default function AdminDashboard() {
       color: "text-pink-600",
       bgColor: "bg-pink-50"
     },
-    { 
-      label: "Other", 
-      value: stats?.other || 0, 
-      icon: <Users className="w-6 h-6" />, 
-      color: "text-purple-600",
-      bgColor: "bg-purple-50"
-    },
   ];
 
   const SortIcon = ({ field }: { field: SortField }) => (
@@ -472,7 +465,7 @@ export default function AdminDashboard() {
                     <div className="pt-3 pb-3 space-y-4">
                       <div className="flex flex-wrap gap-2 items-center">
                         <span className="text-sm text-slate-500 font-medium py-1">Gender:</span>
-                        {["all", "Male", "Female", "Other"].map((gender) => (
+                        {["all", "Male", "Female"].map((gender) => (
                           <button
                             key={gender}
                             onClick={() => setGenderFilter(gender)}

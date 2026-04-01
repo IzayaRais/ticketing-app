@@ -222,6 +222,7 @@ export async function markTicketCheckedIn(ticketId: string) {
       console.log("✅ Added check-in columns:", missingCols.join(", "));
     }
 
+    // Reload rows after ensuring columns exist
     const rows = await sheet.getRows();
 
     const row = rows.find((r) => {
@@ -235,7 +236,10 @@ export async function markTicketCheckedIn(ticketId: string) {
       return { found: false };
     }
 
-    const alreadyChecked = row.get("checkedIn") === "true";
+    // Strict check - treat any truthy value as already checked in
+    const checkedInVal = String(row.get("checkedIn") || "").trim().toLowerCase();
+    const alreadyChecked = checkedInVal === "true" || checkedInVal === "yes" || checkedInVal === "1";
+    
     if (alreadyChecked) {
       await logScanAttempt(ticketId, "duplicate", `Already checked in at ${row.get("checkedInAt") || "unknown time"}`);
       return {
@@ -248,9 +252,23 @@ export async function markTicketCheckedIn(ticketId: string) {
       };
     }
 
+    // Mark as checked in
     row.set("checkedIn", "true");
     row.set("checkedInAt", new Date().toISOString());
     await row.save();
+
+    // Verify the save took effect by re-reading the row
+    const verifyRows = await sheet.getRows();
+    const verifyRow = verifyRows.find((r) => {
+      const val = r.get("ticketId");
+      return val && val.trim().toUpperCase() === ticketId.trim().toUpperCase();
+    });
+
+    if (!verifyRow || String(verifyRow.get("checkedIn") || "").trim().toLowerCase() !== "true") {
+      console.error("❌ Check-in save verification failed:", ticketId);
+      await logScanAttempt(ticketId, "error", "Failed to save check-in status");
+      return { found: false, message: "Failed to save check-in status" };
+    }
 
     await logScanAttempt(ticketId, "success", `Checked in: ${row.get("fullName")}`);
     console.log("✅ Checked in:", ticketId, row.get("fullName"));
@@ -269,3 +287,4 @@ export async function markTicketCheckedIn(ticketId: string) {
     throw error;
   }
 }
+

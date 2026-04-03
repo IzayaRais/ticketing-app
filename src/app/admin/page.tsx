@@ -32,9 +32,11 @@ interface Ticket {
   timestamp: string;
   checkedIn: string;
   checkedInAt: string;
+  scannedBy: string;
 }
 
 interface ScannerUser {
+  name: string;
   email: string;
   createdAt: string;
   createdBy: string;
@@ -68,6 +70,7 @@ export default function AdminDashboard() {
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilterCount, setActiveFilterCount] = useState(0);
   const [scannerUsers, setScannerUsers] = useState<ScannerUser[]>([]);
+  const [scannerName, setScannerName] = useState("");
   const [scannerEmail, setScannerEmail] = useState("");
   const [scannerPassword, setScannerPassword] = useState("");
   const [scannerMessage, setScannerMessage] = useState("");
@@ -143,14 +146,15 @@ export default function AdminDashboard() {
       const res = await fetch("/api/admin/scanner-users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: scannerEmail, password: scannerPassword }),
+        body: JSON.stringify({ name: scannerName, email: scannerEmail, password: scannerPassword }),
       });
       const data = await res.json();
       if (!res.ok) {
         setScannerMessage(data.message || "Failed to save scanner user.");
         return;
       }
-      setScannerMessage("Scanner user saved successfully.");
+      setScannerMessage(data.message || "Scanner user saved successfully.");
+      setScannerName("");
       setScannerEmail("");
       setScannerPassword("");
       fetchScannerUsers();
@@ -224,12 +228,12 @@ export default function AdminDashboard() {
     });
 
   const downloadCSV = () => {
-    const headers = ["Ticket ID", "Full Name", "Email", "Phone", "Student ID", "University", "Gender", "Blood Group", "Payment Method", "Transaction ID", "Payment Number", "Payment From Number", "Status", "Timestamp"];
+    const headers = ["Ticket ID", "Full Name", "Email", "Phone", "Student ID", "University", "Gender", "Blood Group", "Payment Method", "Transaction ID", "Payment Number", "Payment From Number", "Status", "Timestamp", "Scanned", "Checked In At", "Scanned By"];
     const csvContent = [
       headers.join(","),
       ...filteredTickets.map(t => [
         t.ticketId, t.fullName, t.email, t.phone, t.studentId, 
-        t.university, t.gender, t.bloodGroup, t.paymentMethod || "", t.transactionId || "", t.paymentNumber || "", t.paymentFromNumber || "", t.status, t.timestamp
+        t.university, t.gender, t.bloodGroup, t.paymentMethod || "", t.transactionId || "", t.paymentNumber || "", t.paymentFromNumber || "", t.status, t.timestamp, t.checkedIn, t.checkedInAt, t.scannedBy || ""
       ].map(v => `"${v}"`).join(","))
     ].join("\n");
 
@@ -765,10 +769,13 @@ export default function AdminDashboard() {
                   </td>
                   <td className="px-4 py-3">
                     {ticket.checkedIn === "true" ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 rounded-lg text-xs font-bold border border-green-200">
-                        <CheckCircle2 className="w-3 h-3" />
-                        Scanned
-                      </span>
+                      <div className="space-y-1">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 rounded-lg text-xs font-bold border border-green-200">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Scanned
+                        </span>
+                        <p className="text-[11px] text-slate-500">{ticket.scannedBy || "Unknown"}</p>
+                      </div>
                     ) : (
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-bold border border-amber-200">
                         <Clock className="w-3 h-3" />
@@ -809,7 +816,15 @@ export default function AdminDashboard() {
             <Link href="/scan/login" className="text-xs font-bold text-maroon-700 hover:underline">Open Scanner Login</Link>
           </div>
 
-          <form onSubmit={handleCreateScanner} className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+          <form onSubmit={handleCreateScanner} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+            <input
+              type="text"
+              value={scannerName}
+              onChange={(e) => setScannerName(e.target.value)}
+              placeholder="Full name"
+              className="px-3 py-2.5 rounded-xl border border-slate-200 text-sm"
+              required
+            />
             <input
               type="email"
               value={scannerEmail}
@@ -841,6 +856,7 @@ export default function AdminDashboard() {
               <thead>
                 <tr className="text-left text-slate-500">
                   <th className="py-2">Email</th>
+                  <th className="py-2">Name</th>
                   <th className="py-2">Created By</th>
                   <th className="py-2">Created At</th>
                 </tr>
@@ -849,13 +865,14 @@ export default function AdminDashboard() {
                 {scannerUsers.map((u) => (
                   <tr key={u.email} className="border-t border-slate-100">
                     <td className="py-2 font-medium text-slate-700">{u.email}</td>
+                    <td className="py-2 text-slate-700">{u.name || "-"}</td>
                     <td className="py-2 text-slate-600">{u.createdBy || "-"}</td>
                     <td className="py-2 text-slate-500">{u.createdAt ? new Date(u.createdAt).toLocaleString("en-GB") : "-"}</td>
                   </tr>
                 ))}
                 {scannerUsers.length === 0 && (
                   <tr>
-                    <td colSpan={3} className="py-3 text-slate-400">No scanner users yet.</td>
+                    <td colSpan={4} className="py-3 text-slate-400">No scanner users yet.</td>
                   </tr>
                 )}
               </tbody>

@@ -17,6 +17,7 @@ type ScanResult = null | {
   email?: string;
   university?: string;
   checkedInAt?: string;
+  scannedBy?: string;
   message: string;
 };
 
@@ -26,6 +27,13 @@ type ScanHistoryEntry = {
   type: "success" | "duplicate" | "error";
   timestamp: string;
 };
+
+function formatCheckedInTime(value?: string) {
+  if (!value) return "unknown time";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleTimeString();
+}
 
 export default function ScanPage() {
   const { data: session, status } = useSession();
@@ -84,7 +92,8 @@ export default function ScanPage() {
           email: data.email,
           university: data.university,
           checkedInAt: data.checkedInAt,
-          message: `ALREADY SCANNED — Checked in at ${new Date(data.checkedInAt).toLocaleTimeString()}`,
+          scannedBy: data.scannedBy,
+          message: `ALREADY SCANNED — Checked in at ${formatCheckedInTime(data.checkedInAt)}`,
         });
       } else {
         const entry = {
@@ -100,6 +109,7 @@ export default function ScanPage() {
           fullName: data.fullName,
           email: data.email,
           university: data.university,
+          scannedBy: data.scannedBy,
           message: "Entry approved",
         });
       }
@@ -401,7 +411,13 @@ export default function ScanPage() {
                     {result.checkedInAt && (
                       <div className="flex items-center gap-2 text-sm">
                         <Clock className="w-4 h-4 text-slate-400" />
-                        <span className="text-slate-500">Checked in at {new Date(result.checkedInAt).toLocaleTimeString()}</span>
+                        <span className="text-slate-500">Checked in at {formatCheckedInTime(result.checkedInAt)}</span>
+                      </div>
+                    )}
+                    {result.scannedBy && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <User className="w-4 h-4 text-slate-400" />
+                        <span className="text-slate-500">Scanned by {result.scannedBy}</span>
                       </div>
                     )}
                   </div>

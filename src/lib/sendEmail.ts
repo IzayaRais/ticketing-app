@@ -107,10 +107,12 @@ export const generateTicketEmailHTML = (name: string, ticketId: string) => `
 `;
 
 export const generateScannerCredentialsEmailHTML = ({
+  name,
   assignedBy,
   email,
   password,
 }: {
+  name: string;
   assignedBy: string;
   email: string;
   password: string;
@@ -121,7 +123,7 @@ export const generateScannerCredentialsEmailHTML = ({
       <p style="margin: 10px 0 0; color: #cbd5e1; font-size: 13px; letter-spacing: 0.6px;">ANTORIP FAREWELL CONCERT 2026</p>
     </div>
     <div style="border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 14px 14px; background: #ffffff; padding: 28px 30px; line-height: 1.6;">
-      <p style="margin-top: 0;">Hello,</p>
+      <p style="margin-top: 0;">Hello <strong>${name}</strong>,</p>
       <p>You have been assigned as a scanner user by <strong>${assignedBy}</strong>.</p>
 
       <div style="margin: 24px 0; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">

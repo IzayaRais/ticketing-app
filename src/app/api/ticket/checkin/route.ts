@@ -26,10 +26,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Ticket ID is required" }, { status: 400 });
     }
 
-    const result = await markTicketCheckedIn(ticketId);
+    const scannedBy = auth.session.user.name || auth.session.user.email || "Unknown";
+    const result = await markTicketCheckedIn(ticketId, scannedBy);
 
     if (!result.found) {
-      return NextResponse.json({ message: "Ticket not found" }, { status: 404 });
+      return NextResponse.json({ message: result.message || "Ticket not found" }, { status: 404 });
     }
 
     return NextResponse.json(result);

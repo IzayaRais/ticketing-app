@@ -34,9 +34,13 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
+    const name = String(body.name || "").trim();
     const email = String(body.email || "").trim().toLowerCase();
     const password = String(body.password || "");
 
+    if (!name || name.length < 2) {
+      return NextResponse.json({ message: "Name is required (min 2 characters)." }, { status: 400 });
+    }
     if (!email || !email.includes("@")) {
       return NextResponse.json({ message: "Valid email is required." }, { status: 400 });
     }
@@ -44,12 +48,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Password must be at least 6 characters." }, { status: 400 });
     }
 
-    await createScannerUser(email, password, auth.session.user.email || "admin");
+    await createScannerUser(name, email, password, auth.session.user.email || "admin");
     let emailWarning = "";
 
     try {
       const assignedBy = auth.session.user.email || "admin";
       const html = generateScannerCredentialsEmailHTML({
+        name,
         assignedBy,
         email,
         password,

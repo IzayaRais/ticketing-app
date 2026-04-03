@@ -61,13 +61,13 @@ export const authOptions: NextAuthOptions = {
 
         if (!validation.success) return null;
 
-        const valid = await validateScannerUser(credentials.email, credentials.password);
-        if (!valid) return null;
+        const scannerProfile = await validateScannerUser(credentials.email, credentials.password);
+        if (!scannerProfile) return null;
 
         return {
-          id: credentials.email.toLowerCase(),
-          email: credentials.email.toLowerCase(),
-          name: "Scanner User",
+          id: scannerProfile.email.toLowerCase(),
+          email: scannerProfile.email.toLowerCase(),
+          name: scannerProfile.name || "Scanner User",
           role: "scanner" as const,
         };
       },

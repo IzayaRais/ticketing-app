@@ -50,17 +50,16 @@ async function getDoc() {
 }
 
 function getBangladeshDateTime() {
-  const formatter = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Asia/Dhaka",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  });
-  return `${formatter.format(new Date()).replace(" ", "T")}+06:00`;
+  // Create a stable ISO-like timestamp in BD time (+06:00) without locale quirks (e.g. hour 24).
+  const bdMillis = Date.now() + 6 * 60 * 60 * 1000;
+  const bd = new Date(bdMillis);
+  const yyyy = bd.getUTCFullYear();
+  const mm = String(bd.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(bd.getUTCDate()).padStart(2, "0");
+  const hh = String(bd.getUTCHours()).padStart(2, "0");
+  const min = String(bd.getUTCMinutes()).padStart(2, "0");
+  const ss = String(bd.getUTCSeconds()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}T${hh}:${min}:${ss}+06:00`;
 }
 
 async function ensureHeaders(sheet: GoogleSpreadsheetWorksheet) {
@@ -145,6 +144,7 @@ export async function getTicketById(ticketId: string) {
       timestamp: row.get("timestamp"),
       checkedIn: row.get("checkedIn") || "",
       checkedInAt: row.get("checkedInAt") || "",
+      scannedBy: row.get("scannedBy") || "",
     };
   } catch (error) {
     throw error;
@@ -206,6 +206,7 @@ export async function getAllTickets() {
       timestamp: r.get("timestamp"),
       checkedIn: r.get("checkedIn") || "",
       checkedInAt: r.get("checkedInAt") || "",
+      scannedBy: r.get("scannedBy") || "",
     }));
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
@@ -246,7 +247,7 @@ export async function logScanAttempt(ticketId: string, result: "success" | "dupl
   }
 }
 
-export async function markTicketCheckedIn(ticketId: string) {
+export async function markTicketCheckedIn(ticketId: string, scannedBy?: string) {
   try {
     const doc = await getDoc();
     const sheet = doc.sheetsByIndex[0];
@@ -256,6 +257,7 @@ export async function markTicketCheckedIn(ticketId: string) {
     const missingCols: string[] = [];
     if (!headers.includes("checkedIn")) missingCols.push("checkedIn");
     if (!headers.includes("checkedInAt")) missingCols.push("checkedInAt");
+    if (!headers.includes("scannedBy")) missingCols.push("scannedBy");
 
     if (missingCols.length > 0) {
       await sheet.setHeaderRow([...headers, ...missingCols]);
@@ -286,6 +288,7 @@ export async function markTicketCheckedIn(ticketId: string) {
         found: true,
         alreadyCheckedIn: true,
         checkedInAt: row.get("checkedInAt") || "",
+        scannedBy: row.get("scannedBy") || "",
         fullName: row.get("fullName"),
         email: row.get("email"),
         university: row.get("university"),
@@ -295,6 +298,7 @@ export async function markTicketCheckedIn(ticketId: string) {
     // Mark as checked in
     row.set("checkedIn", "true");
     row.set("checkedInAt", getBangladeshDateTime());
+    row.set("scannedBy", scannedBy || "Unknown");
     await row.save();
 
     // Verify the save took effect by re-reading the row
@@ -320,6 +324,7 @@ export async function markTicketCheckedIn(ticketId: string) {
       email: row.get("email"),
       university: row.get("university"),
       ticketId: row.get("ticketId"),
+      scannedBy: row.get("scannedBy") || scannedBy || "",
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";

@@ -61,7 +61,7 @@ async function getScannerUsersSheet() {
 }
 
 async function ensureScannerUsersHeaders(sheet: GoogleSpreadsheetWorksheet) {
-  const requiredHeaders = ["email", "passwordHash", "createdAt", "createdBy", "active"];
+  const requiredHeaders = ["name", "email", "passwordHash", "createdAt", "createdBy", "active"];
   try {
     await sheet.loadHeaderRow();
     const headers = [...sheet.headerValues];
@@ -96,6 +96,7 @@ export async function listScannerUsers() {
   return rows
     .filter((r) => String(r.get("active") || "true").toLowerCase() === "true")
     .map((r) => ({
+      name: r.get("name") || "",
       email: r.get("email"),
       createdAt: r.get("createdAt"),
       createdBy: r.get("createdBy"),
@@ -103,7 +104,8 @@ export async function listScannerUsers() {
     }));
 }
 
-export async function createScannerUser(email: string, password: string, createdBy: string) {
+export async function createScannerUser(name: string, email: string, password: string, createdBy: string) {
+  const normalizedName = name.trim();
   const normalizedEmail = email.trim().toLowerCase();
   const sheet = await getScannerUsersSheet();
   const rows = await sheet.getRows();
@@ -118,6 +120,7 @@ export async function createScannerUser(email: string, password: string, created
 
   if (exists) {
     exists.set("passwordHash", passwordHash);
+    exists.set("name", normalizedName);
     exists.set("createdAt", now);
     exists.set("createdBy", createdBy);
     exists.set("active", "true");
@@ -126,6 +129,7 @@ export async function createScannerUser(email: string, password: string, created
   }
 
   await sheet.addRow({
+    name: normalizedName,
     email: normalizedEmail,
     passwordHash,
     createdAt: now,
@@ -141,5 +145,10 @@ export async function validateScannerUser(email: string, password: string) {
   const row = rows.find((r) => String(r.get("email")).trim().toLowerCase() === normalizedEmail);
   if (!row) return false;
   if (String(row.get("active") || "true").toLowerCase() !== "true") return false;
-  return verifyPassword(password, row.get("passwordHash"));
+  const valid = verifyPassword(password, row.get("passwordHash"));
+  if (!valid) return false;
+  return {
+    name: row.get("name") || "Scanner User",
+    email: row.get("email") || normalizedEmail,
+  };
 }

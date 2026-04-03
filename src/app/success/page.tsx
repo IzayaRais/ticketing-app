@@ -78,6 +78,12 @@ function SuccessContent() {
             Your ticket has been generated and sent to{" "}
             <span className="font-bold text-maroon-700">{email}</span>. Check your inbox!
           </p>
+          <p className="text-slate-500 font-medium leading-relaxed mt-2">
+            Please save this ticket ID, remember your email address, and download your ticket from this page.
+          </p>
+          <p className="text-slate-400 text-sm font-medium mt-2">
+            Keep your Ticket ID + Email safe for future access and verification.
+          </p>
         </motion.div>
 
         {/* Ticket card */}

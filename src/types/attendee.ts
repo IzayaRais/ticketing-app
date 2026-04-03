@@ -15,4 +15,5 @@ export interface AttendeeRow {
   timestamp: string;
   checkedIn: string;
   checkedInAt: string;
+  scannedBy: string;
 }

@@ -60,6 +60,7 @@ export async function GET() {
       timestamp: row.get("timestamp"),
       checkedIn: row.get("checkedIn") || "",
       checkedInAt: row.get("checkedInAt") || "",
+      scannedBy: row.get("scannedBy") || "",
     }));
 
     return NextResponse.json({ attendees });

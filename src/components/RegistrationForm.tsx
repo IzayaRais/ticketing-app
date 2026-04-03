@@ -330,6 +330,9 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
                   Payment Required ({university})
                 </p>
                 <p className="text-sm text-slate-600">
+                  Payment amount: <span className="font-bold">200 BDT</span>.
+                </p>
+                <p className="text-sm text-slate-600 mt-1">
                   Send payment via bKash or Nagad to{" "}
                   <button
                     type="button"
@@ -368,7 +371,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
                       >
                         <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center">
                           <Image
-                            src={isBkash ? "/payments/bkash.svg" : "/payments/nagad.webp"}
+                            src={isBkash ? "/payments/bkash.png" : "/payments/nagad.webp"}
                             alt={method}
                             width={28}
                             height={28}

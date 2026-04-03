@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { signIn, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -91,30 +91,9 @@ export default function AdminDashboard() {
   const [scannerMessage, setScannerMessage] = useState("");
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [liveActivities, setLiveActivities] = useState<LiveActivityItem[]>([]);
+  const [lastSyncedAt, setLastSyncedAt] = useState<string>("");
   const previousSnapshotRef = useRef<Map<string, { checkedIn: string }>>(new Map());
   const initializedRef = useRef(false);
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      const userRole = session?.user?.role;
-      if (userRole !== "admin") {
-        setLoading(false);
-        return;
-      }
-      fetchData();
-      fetchScannerUsers();
-    } else if (status === "unauthenticated") {
-      setLoading(false);
-    }
-  }, [status, session]);
-
-  useEffect(() => {
-    if (status !== "authenticated" || session?.user?.role !== "admin") return;
-    const interval = setInterval(() => {
-      fetchData();
-    }, 15000);
-    return () => clearInterval(interval);
-  }, [status, session]);
 
   useEffect(() => {
     let count = 0;
@@ -135,28 +114,13 @@ export default function AdminDashboard() {
     setSearch("");
   };
 
-  const fetchData = async () => {
-    try {
-      const res = await fetch("/api/admin/tickets", { cache: "no-store" });
-      const data = await res.json();
-      const incomingTickets = data.tickets || [];
-      setTickets(incomingTickets);
-      setStats(data);
-      processLiveData(incomingTickets);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const normalizeEventDate = (value?: string) => {
     if (!value) return new Date();
     const d = new Date(value);
     return Number.isNaN(d.getTime()) ? new Date() : d;
   };
 
-  const processLiveData = (incoming: Ticket[]) => {
+  const processLiveData = useCallback((incoming: Ticket[]) => {
     const snapshot = new Map<string, { checkedIn: string }>();
     const newNotifications: NotificationItem[] = [];
 
@@ -211,9 +175,25 @@ export default function AdminDashboard() {
 
     previousSnapshotRef.current = snapshot;
     initializedRef.current = true;
-  };
+  }, []);
 
-  const fetchScannerUsers = async () => {
+  const fetchData = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/tickets", { cache: "no-store" });
+      const data = await res.json();
+      const incomingTickets = data.tickets || [];
+      setTickets(incomingTickets);
+      setStats(data);
+      processLiveData(incomingTickets);
+      setLastSyncedAt(new Date().toISOString());
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [processLiveData]);
+
+  const fetchScannerUsers = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/scanner-users", { cache: "no-store" });
       const data = await res.json();
@@ -221,7 +201,29 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error("Error fetching scanner users:", error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      const userRole = session?.user?.role;
+      if (userRole !== "admin") {
+        setLoading(false);
+        return;
+      }
+      fetchData();
+      fetchScannerUsers();
+    } else if (status === "unauthenticated") {
+      setLoading(false);
+    }
+  }, [status, session, fetchData, fetchScannerUsers]);
+
+  useEffect(() => {
+    if (status !== "authenticated" || session?.user?.role !== "admin") return;
+    const interval = setInterval(() => {
+      fetchData();
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [status, session, fetchData]);
 
   const handleCreateScanner = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -635,7 +637,10 @@ export default function AdminDashboard() {
                   <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
                 </button>
                 <button
-                  onClick={fetchData}
+                  onClick={() => {
+                    fetchData();
+                    fetchScannerUsers();
+                  }}
                   className="flex items-center gap-2 px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:border-slate-300 transition-all"
                 >
                   <RefreshCw className="w-4 h-4" />
@@ -656,6 +661,9 @@ export default function AdminDashboard() {
                   <span className="hidden sm:inline">Export CSV</span>
                 </button>
               </div>
+              <p className="text-xs text-slate-400">
+                Live sync with Sheets {lastSyncedAt ? `• last synced ${new Date(lastSyncedAt).toLocaleTimeString("en-GB")}` : ""}
+              </p>
               
               <AnimatePresence>
                 {showFilters && (

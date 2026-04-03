@@ -299,6 +299,7 @@ export async function markTicketCheckedIn(ticketId: string, scannedBy?: string) 
     row.set("checkedIn", "true");
     row.set("checkedInAt", getBangladeshDateTime());
     row.set("scannedBy", scannedBy || "Unknown");
+    row.set("status", "Verified");
     await row.save();
 
     // Verify the save took effect by re-reading the row

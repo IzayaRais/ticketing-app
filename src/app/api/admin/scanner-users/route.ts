@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createScannerUser, listScannerUsers } from "@/lib/scannerUsers";
+import { generateScannerCredentialsEmailHTML, sendEmail } from "@/lib/sendEmail";
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
@@ -44,7 +45,33 @@ export async function POST(request: Request) {
     }
 
     await createScannerUser(email, password, auth.session.user.email || "admin");
-    return NextResponse.json({ message: "Scanner user saved." }, { status: 200 });
+    let emailWarning = "";
+
+    try {
+      const assignedBy = auth.session.user.email || "admin";
+      const html = generateScannerCredentialsEmailHTML({
+        assignedBy,
+        email,
+        password,
+      });
+
+      await sendEmail({
+        to: email,
+        subject: "Your Scanner Access Credentials",
+        html,
+      });
+    } catch (emailError) {
+      const message = emailError instanceof Error ? emailError.message : "unknown email error";
+      emailWarning = `Scanner user created, but credential email could not be sent: ${message}`;
+    }
+
+    return NextResponse.json(
+      {
+        message: emailWarning || "Scanner user saved and credentials email sent.",
+        emailSent: !emailWarning,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ message }, { status: 500 });

@@ -11,7 +11,7 @@ export const registrationSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   phone: z
     .string()
-    .regex(/^(?:\+880\s?|0)1[3-9]\d{8}$/, "Phone must be in format: +8801XXXXXXXXX or 01XXXXXXXXX"),
+    .regex(/^(?:880|0)1[3-9]\d{8}$/, "Phone must be in format: 8801XXXXXXXXX or 01XXXXXXXXX"),
   studentId: z
     .string()
     .regex(/^[A-Za-z0-9]{5,15}$/, "Student ID must be 5-15 alphanumeric characters"),
@@ -28,7 +28,7 @@ export const registrationSchema = z.object({
   const needsPayment = data.university === "BUP" || data.university === "AFMC";
   const transactionId = (data.transactionId || "").trim();
   const paymentFromNumber = (data.paymentFromNumber || "").trim();
-  const validBanglaPhone = /^(?:\+880\s?|0)1[3-9]\d{8}$/;
+  const validBanglaPhone = /^(?:880|0)1[3-9]\d{8}$/;
 
   if (needsPayment) {
     if (!data.paymentMethod) {
@@ -63,7 +63,7 @@ export const registrationSchema = z.object({
       ctx.addIssue({
         code: "custom",
         path: ["paymentFromNumber"],
-        message: "Payment number must be in format: +8801XXXXXXXXX or 01XXXXXXXXX",
+        message: "Payment number must be in format: 8801XXXXXXXXX or 01XXXXXXXXX",
       });
     }
   }

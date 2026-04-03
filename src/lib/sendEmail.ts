@@ -7,15 +7,29 @@ const SMTP_PASS = process.env.SMTP_PASS;
 // Using Antorip Farewell Concert as the display name
 const EMAIL_FROM = process.env.EMAIL_FROM || '"Antorip Farewell Concert" <no-reply@premiumevents.com>';
 
-export const transporter = nodemailer.createTransport({
-  host: SMTP_HOST,
-  port: SMTP_PORT,
-  secure: SMTP_PORT === 465, // true for 465, false for other ports
-  auth: {
-    user: SMTP_USER,
-    pass: SMTP_PASS,
-  },
-});
+const SMTP_SECONDARY_HOST = process.env.SMTP_SECONDARY_HOST || SMTP_HOST;
+const SMTP_SECONDARY_PORT = parseInt(process.env.SMTP_SECONDARY_PORT || String(SMTP_PORT));
+const SMTP_SECONDARY_USER = process.env.SMTP_SECONDARY_USER;
+const SMTP_SECONDARY_PASS = process.env.SMTP_SECONDARY_PASS;
+const EMAIL_FROM_SECONDARY = process.env.EMAIL_FROM_SECONDARY || EMAIL_FROM;
+
+function createTransport(host: string, port: number, user?: string, pass?: string) {
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: {
+      user,
+      pass,
+    },
+  });
+}
+
+export const transporter = createTransport(SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS);
+const secondaryTransporter =
+  SMTP_SECONDARY_USER && SMTP_SECONDARY_PASS
+    ? createTransport(SMTP_SECONDARY_HOST, SMTP_SECONDARY_PORT, SMTP_SECONDARY_USER, SMTP_SECONDARY_PASS)
+    : null;
 
 interface EmailOptions {
   to: string;
@@ -42,6 +56,28 @@ export async function sendEmail({ to, subject, html, attachments }: EmailOptions
     console.log("Email sent: %s", info.messageId);
     return info;
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    const shouldTrySecondary =
+      !!secondaryTransporter &&
+      /(quota|limit|rate|too many|daily|exceed|temporar|throttl|invalid login|auth)/i.test(message);
+
+    if (shouldTrySecondary && secondaryTransporter) {
+      try {
+        const info = await secondaryTransporter.sendMail({
+          from: EMAIL_FROM_SECONDARY,
+          to,
+          subject,
+          html,
+          attachments,
+        });
+        console.log("Email sent via secondary SMTP: %s", info.messageId);
+        return info;
+      } catch (secondaryError) {
+        console.error("Primary and secondary email send failed:", secondaryError);
+        throw secondaryError;
+      }
+    }
+
     console.error("Error sending email:", error);
     throw error;
   }
@@ -65,6 +101,44 @@ export const generateTicketEmailHTML = (name: string, ticketId: string) => `
       <div style="font-size: 11px; color: #94a3b8; margin-top: 40px; text-align: center; border-top: 1px solid #f1f5f9; pt: 20px;">
         Antorip Farewell Concert · Premium Event Management System<br>
         Build with excellence.
+      </div>
+    </div>
+  </div>
+`;
+
+export const generateScannerCredentialsEmailHTML = ({
+  assignedBy,
+  email,
+  password,
+}: {
+  assignedBy: string;
+  email: string;
+  password: string;
+}) => `
+  <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; color: #1f2937;">
+    <div style="background: linear-gradient(135deg, #0f172a, #1e293b); padding: 36px; border-radius: 14px 14px 0 0; text-align: center;">
+      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 800;">Scanner Access Assigned</h1>
+      <p style="margin: 10px 0 0; color: #cbd5e1; font-size: 13px; letter-spacing: 0.6px;">ANTORIP FAREWELL CONCERT 2026</p>
+    </div>
+    <div style="border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 14px 14px; background: #ffffff; padding: 28px 30px; line-height: 1.6;">
+      <p style="margin-top: 0;">Hello,</p>
+      <p>You have been assigned as a scanner user by <strong>${assignedBy}</strong>.</p>
+
+      <div style="margin: 24px 0; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
+        <div style="background: #f8fafc; padding: 10px 14px; font-size: 12px; color: #475569; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;">Login Credentials</div>
+        <div style="padding: 16px 14px; background: #ffffff;">
+          <p style="margin: 0 0 10px;"><strong>Email:</strong> ${email}</p>
+          <p style="margin: 0;"><strong>Password:</strong> ${password}</p>
+        </div>
+      </div>
+
+      <p style="margin-bottom: 8px;"><strong>Scanner Login URL:</strong></p>
+      <p style="margin-top: 0;"><a href="${process.env.NEXT_PUBLIC_SITE_URL || "https://antorip.vercel.app"}/scan/login">${process.env.NEXT_PUBLIC_SITE_URL || "https://antorip.vercel.app"}/scan/login</a></p>
+
+      <p style="margin-top: 20px; color: #b91c1c; font-weight: 700;">Do not share these credentials publicly.</p>
+
+      <div style="margin-top: 30px; font-size: 11px; color: #64748b; border-top: 1px solid #f1f5f9; padding-top: 14px;">
+        This is an automated system email for scanner access provisioning.
       </div>
     </div>
   </div>

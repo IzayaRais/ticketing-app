@@ -69,6 +69,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
   const [success, setSuccess] = useState(false);
   const [step, setStep] = useState(0);
   const [selectedInstitute, setSelectedInstitute] = useState<Institute | null>(null);
+  const [copiedPaymentNumber, setCopiedPaymentNumber] = useState(false);
   const router = useRouter();
 
   const {
@@ -144,6 +145,16 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
     }
   }, [onSuccess, router, selectedInstitute]);
 
+  const copyPaymentNumber = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(PAYMENT_NUMBER);
+      setCopiedPaymentNumber(true);
+      setTimeout(() => setCopiedPaymentNumber(false), 1500);
+    } catch {
+      setCopiedPaymentNumber(false);
+    }
+  }, []);
+
   if (success) {
     return (
       <div className="text-center py-12">
@@ -216,7 +227,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
             <input
               {...register("phone")}
               className="w-full px-4 py-3.5 rounded-xl border border-slate-200/80 bg-white text-sm font-medium text-slate-800 placeholder:text-slate-300 outline-none transition-all duration-200 focus:border-maroon-700 focus:ring-4 focus:ring-maroon-700/8"
-              placeholder="+880 1XXXXXXXXX"
+              placeholder="8801XXXXXXXXX or 01XXXXXXXXX"
             />
             {errors.phone && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.phone.message}</p>}
           </div>
@@ -319,7 +330,17 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
                   Payment Required ({university})
                 </p>
                 <p className="text-sm text-slate-600">
-                  Send payment via bKash or Nagad to <span className="font-bold">{PAYMENT_NUMBER}</span>, then enter your transaction ID.
+                  Send payment via bKash or Nagad to{" "}
+                  <button
+                    type="button"
+                    onClick={copyPaymentNumber}
+                    className="inline-flex items-center gap-1 rounded-md border border-amber-300 bg-white px-2 py-0.5 font-bold text-amber-800 hover:bg-amber-100 transition-colors"
+                    title="Copy payment number"
+                  >
+                    {PAYMENT_NUMBER}
+                    <span className="text-[10px] font-semibold text-amber-700">{copiedPaymentNumber ? "Copied" : "Copy"}</span>
+                  </button>
+                  , then enter your transaction ID.
                 </p>
                 <p className="text-xs font-semibold text-red-700 mt-2">
                   Warning: Duplicate or fake transaction IDs will invalidate your ticket and the registration will be deleted automatically.
@@ -347,7 +368,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
                       >
                         <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center">
                           <Image
-                            src={isBkash ? "/payments/bkash.svg" : "/payments/nagad.svg"}
+                            src={isBkash ? "/payments/bkash.svg" : "/payments/nagad.webp"}
                             alt={method}
                             width={28}
                             height={28}
@@ -383,7 +404,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
                 <input
                   {...register("paymentFromNumber")}
                   className="w-full px-4 py-3.5 rounded-xl border border-slate-200/80 bg-white text-sm font-medium text-slate-800 placeholder:text-slate-300 outline-none transition-all duration-200 focus:border-maroon-700 focus:ring-4 focus:ring-maroon-700/8"
-                  placeholder="+8801XXXXXXXXX or 01XXXXXXXXX"
+                  placeholder="8801XXXXXXXXX or 01XXXXXXXXX"
                 />
                 {errors.paymentFromNumber && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.paymentFromNumber.message}</p>}
               </div>

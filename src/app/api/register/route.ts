@@ -36,6 +36,13 @@ function getClientIp(request: Request): string {
   );
 }
 
+function normalizeBdPhone(value: string): string {
+  const cleaned = value.replace(/\s+/g, "");
+  if (cleaned.startsWith("01")) return `88${cleaned}`;
+  if (cleaned.startsWith("8801")) return cleaned;
+  return cleaned;
+}
+
 export async function POST(request: Request) {
   const ip = getClientIp(request);
   if (!checkRateLimit(ip)) {
@@ -59,9 +66,9 @@ export async function POST(request: Request) {
     const { data } = result;
     const normalizedData = {
       ...data,
-      phone: data.phone.replace(/\s+/g, ""),
+      phone: normalizeBdPhone(data.phone),
       transactionId: data.transactionId?.trim().toUpperCase() || "",
-      paymentFromNumber: data.paymentFromNumber?.replace(/\s+/g, "") || "",
+      paymentFromNumber: data.paymentFromNumber ? normalizeBdPhone(data.paymentFromNumber) : "",
     };
 
     const existing = await getTicketByEmail(normalizedData.email);

@@ -126,7 +126,10 @@ export default function ScanPage() {
   };
 
   useEffect(() => {
-    if (status !== "authenticated" || session?.user?.role !== "admin") return;
+    if (
+      status !== "authenticated" ||
+      (session?.user?.role !== "admin" && session?.user?.role !== "scanner")
+    ) return;
 
     let scanner: Html5Qrcode | null = null;
     let cancelled = false;
@@ -246,9 +249,9 @@ export default function ScanPage() {
       <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 pt-8 pb-6">
         <div className="max-w-2xl mx-auto px-4">
           <div className="flex items-center justify-between">
-            <Link href="/admin" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+            <Link href={session?.user?.role === "admin" ? "/admin" : "/"} className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
               <ArrowLeft className="w-5 h-5" />
-              <span className="text-sm font-medium">Back to Admin</span>
+              <span className="text-sm font-medium">{session?.user?.role === "admin" ? "Back to Admin" : "Back to Home"}</span>
             </Link>
             <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full animate-pulse ${cameraReady ? "bg-green-400" : cameraError ? "bg-red-400" : "bg-amber-400"}`} />

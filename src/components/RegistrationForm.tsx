@@ -77,7 +77,6 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
     register,
     handleSubmit,
     setValue,
-    getValues,
     watch,
     trigger,
     formState: { errors },
@@ -89,6 +88,9 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
   });
 
   const university = watch("university");
+  const gender = watch("gender");
+  const bloodGroup = watch("bloodGroup");
+  const paymentMethod = watch("paymentMethod");
   const requiresPayment = university === "BUP" || university === "AFMC";
 
   useEffect(() => {
@@ -275,8 +277,14 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
           ) : (
             <SelectField
               label="University"
-              value={getValues("university") || ""}
-              onChange={(val) => setValue("university", val as "MIST" | "BUP" | "AFMC", { shouldDirty: true })}
+              value={university || ""}
+              onChange={(val) =>
+                setValue("university", val as "MIST" | "BUP" | "AFMC", {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                  shouldValidate: true,
+                })
+              }
               options={institutes}
               placeholder="Select your university"
               error={errors.university?.message}
@@ -285,8 +293,14 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
 
           <SelectField
             label="Gender"
-            value={getValues("gender") || ""}
-            onChange={(val) => setValue("gender", val as "Male" | "Female", { shouldDirty: true })}
+            value={gender || ""}
+            onChange={(val) =>
+              setValue("gender", val as "Male" | "Female", {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+              })
+            }
             options={genders}
             placeholder="Select gender"
             error={errors.gender?.message}
@@ -294,8 +308,14 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
 
           <SelectField
             label="Blood Group"
-            value={getValues("bloodGroup") || ""}
-            onChange={(val) => setValue("bloodGroup", val, { shouldDirty: true })}
+            value={bloodGroup || ""}
+            onChange={(val) =>
+              setValue("bloodGroup", val, {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+              })
+            }
             options={bloodGroups as unknown as string[]}
             placeholder="Select blood group"
             error={errors.bloodGroup?.message}
@@ -363,13 +383,19 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {paymentMethodOptions.map((method) => {
-                    const active = getValues("paymentMethod") === method;
+                    const active = paymentMethod === method;
                     const isBkash = method === "BKASH";
                     return (
                       <button
                         key={method}
                         type="button"
-                        onClick={() => setValue("paymentMethod", method, { shouldDirty: true })}
+                        onClick={() =>
+                          setValue("paymentMethod", method, {
+                            shouldDirty: true,
+                            shouldTouch: true,
+                            shouldValidate: true,
+                          })
+                        }
                         className={`rounded-xl border p-3 flex items-center gap-3 text-left transition-all ${
                           active
                             ? "border-maroon-700 bg-white shadow-sm"

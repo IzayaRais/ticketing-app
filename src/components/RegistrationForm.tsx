@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registrationSchema, RegistrationData } from "@/lib/validations";
 import { institutes } from "@/lib/validations";
+import Image from "next/image";
 import {
   paymentMethodOptions,
   PAYMENT_NUMBER,
@@ -76,6 +77,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
     setValue,
     getValues,
     watch,
+    trigger,
     formState: { errors },
   } = useForm<RegistrationData>({
     resolver: zodResolver(registrationSchema),
@@ -103,6 +105,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
     if (!requiresPayment) {
       setValue("paymentMethod", undefined, { shouldValidate: true });
       setValue("transactionId", "", { shouldValidate: true });
+      setValue("paymentFromNumber", "", { shouldValidate: true });
     }
   }, [requiresPayment, setValue]);
 
@@ -155,6 +158,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <input type="hidden" {...register("university")} />
       {error && (
         <div className="flex items-start gap-3 p-4 bg-red-50/80 border border-red-100 rounded-xl">
           <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
@@ -219,7 +223,10 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
 
           <button
             type="button"
-            onClick={() => setStep(1)}
+            onClick={async () => {
+              const ok = await trigger(["fullName", "email", "phone"]);
+              if (ok) setStep(1);
+            }}
             className="w-full flex items-center justify-center gap-2 py-3.5 bg-maroon-700 text-white rounded-xl font-semibold text-sm hover:bg-maroon-800 transition-colors duration-200 mt-2"
           >
             Continue <ArrowRight className="w-4 h-4" />
@@ -249,6 +256,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
               <div className="w-full px-4 py-3.5 rounded-xl border border-slate-200/80 bg-slate-50 text-sm font-bold text-slate-800">
                 {selectedInstitute}
               </div>
+              {errors.university && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.university.message}</p>}
             </div>
           ) : (
             <SelectField
@@ -280,7 +288,10 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
             </button>
             <button
               type="button"
-              onClick={() => setStep(2)}
+              onClick={async () => {
+                const ok = await trigger(["studentId", "university", "gender"]);
+                if (ok) setStep(2);
+              }}
               className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-maroon-700 text-white rounded-xl font-semibold text-sm hover:bg-maroon-800 transition-colors"
             >
               Continue <ArrowRight className="w-4 h-4" />
@@ -310,16 +321,48 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
                 <p className="text-sm text-slate-600">
                   Send payment via bKash or Nagad to <span className="font-bold">{PAYMENT_NUMBER}</span>, then enter your transaction ID.
                 </p>
+                <p className="text-xs font-semibold text-red-700 mt-2">
+                  Warning: Duplicate or fake transaction IDs will invalidate your ticket and the registration will be deleted automatically.
+                </p>
               </div>
 
-              <SelectField
-                label="Payment Method"
-                value={getValues("paymentMethod") || ""}
-                onChange={(val) => setValue("paymentMethod", val as "BKASH" | "NAGAD", { shouldValidate: true })}
-                options={paymentMethodOptions}
-                placeholder="Select payment method"
-                error={errors.paymentMethod?.message}
-              />
+              <div>
+                <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-2">
+                  Payment Method
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {paymentMethodOptions.map((method) => {
+                    const active = getValues("paymentMethod") === method;
+                    const isBkash = method === "BKASH";
+                    return (
+                      <button
+                        key={method}
+                        type="button"
+                        onClick={() => setValue("paymentMethod", method, { shouldValidate: true })}
+                        className={`rounded-xl border p-3 flex items-center gap-3 text-left transition-all ${
+                          active
+                            ? "border-maroon-700 bg-white shadow-sm"
+                            : "border-slate-200 bg-white/80 hover:border-slate-300"
+                        }`}
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center">
+                          <Image
+                            src={isBkash ? "/payments/bkash.svg" : "/payments/nagad.svg"}
+                            alt={method}
+                            width={28}
+                            height={28}
+                          />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-slate-800">{isBkash ? "bKash" : "Nagad"}</p>
+                          <p className="text-xs text-slate-500">Tap to select</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+                {errors.paymentMethod && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.paymentMethod.message}</p>}
+              </div>
 
               <div>
                 <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1.5">
@@ -331,6 +374,18 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
                   placeholder="Enter your bKash/Nagad transaction ID"
                 />
                 {errors.transactionId && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.transactionId.message}</p>}
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1.5">
+                  Payment Done From Number
+                </label>
+                <input
+                  {...register("paymentFromNumber")}
+                  className="w-full px-4 py-3.5 rounded-xl border border-slate-200/80 bg-white text-sm font-medium text-slate-800 placeholder:text-slate-300 outline-none transition-all duration-200 focus:border-maroon-700 focus:ring-4 focus:ring-maroon-700/8"
+                  placeholder="+8801XXXXXXXXX or 01XXXXXXXXX"
+                />
+                {errors.paymentFromNumber && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.paymentFromNumber.message}</p>}
               </div>
             </div>
           )}

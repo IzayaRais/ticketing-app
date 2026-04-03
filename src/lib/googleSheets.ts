@@ -49,11 +49,25 @@ async function getDoc() {
   return doc;
 }
 
+function getBangladeshDateTime() {
+  const formatter = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Asia/Dhaka",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+  return `${formatter.format(new Date()).replace(" ", "T")}+06:00`;
+}
+
 async function ensureHeaders(sheet: GoogleSpreadsheetWorksheet) {
   const requiredHeaders = [
     "timestamp", "ticketId", "fullName", "email",
     "phone", "studentId", "university", "gender", "bloodGroup",
-    "paymentMethod", "transactionId", "paymentNumber",
+    "paymentMethod", "transactionId", "paymentNumber", "paymentFromNumber",
     "status",
   ];
 
@@ -93,6 +107,7 @@ export async function appendToSheet(data: RegistrationData & { ticketId: string 
       paymentMethod: data.paymentMethod || "",
       transactionId: data.transactionId || "",
       paymentNumber: data.paymentMethod ? PAYMENT_NUMBER : "",
+      paymentFromNumber: data.paymentFromNumber || "",
       status: "Verified",
     });
   } catch (error) {
@@ -125,6 +140,7 @@ export async function getTicketById(ticketId: string) {
       paymentMethod: row.get("paymentMethod") || "",
       transactionId: row.get("transactionId") || "",
       paymentNumber: row.get("paymentNumber") || "",
+      paymentFromNumber: row.get("paymentFromNumber") || "",
       status: row.get("status"),
       timestamp: row.get("timestamp"),
       checkedIn: row.get("checkedIn") || "",
@@ -157,6 +173,7 @@ export async function getTicketByEmail(email: string) {
       paymentMethod: row.get("paymentMethod") || "",
       transactionId: row.get("transactionId") || "",
       paymentNumber: row.get("paymentNumber") || "",
+      paymentFromNumber: row.get("paymentFromNumber") || "",
       status: row.get("status"),
       timestamp: row.get("timestamp"),
     };
@@ -184,6 +201,7 @@ export async function getAllTickets() {
       paymentMethod: r.get("paymentMethod") || "",
       transactionId: r.get("transactionId") || "",
       paymentNumber: r.get("paymentNumber") || "",
+      paymentFromNumber: r.get("paymentFromNumber") || "",
       status: r.get("status"),
       timestamp: r.get("timestamp"),
       checkedIn: r.get("checkedIn") || "",
@@ -276,7 +294,7 @@ export async function markTicketCheckedIn(ticketId: string) {
 
     // Mark as checked in
     row.set("checkedIn", "true");
-    row.set("checkedInAt", new Date().toISOString());
+    row.set("checkedInAt", getBangladeshDateTime());
     await row.save();
 
     // Verify the save took effect by re-reading the row

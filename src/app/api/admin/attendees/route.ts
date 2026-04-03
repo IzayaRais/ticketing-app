@@ -55,6 +55,7 @@ export async function GET() {
       paymentMethod: row.get("paymentMethod") || "",
       transactionId: row.get("transactionId") || "",
       paymentNumber: row.get("paymentNumber") || "",
+      paymentFromNumber: row.get("paymentFromNumber") || "",
       status: row.get("status"),
       timestamp: row.get("timestamp"),
       checkedIn: row.get("checkedIn") || "",

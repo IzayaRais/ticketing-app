@@ -219,7 +219,7 @@ export default function ScanPage() {
     );
   }
 
-  if (status === "unauthenticated" || session?.user?.role !== "admin") {
+  if (status === "unauthenticated" || (session?.user?.role !== "admin" && session?.user?.role !== "scanner")) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-3xl shadow-xl border border-slate-100 p-10 text-center max-w-md w-full">
@@ -227,10 +227,15 @@ export default function ScanPage() {
             <AlertTriangle className="w-10 h-10 text-red-500" />
           </div>
           <h2 className="text-2xl font-black text-slate-800 mb-2">Access Denied</h2>
-          <p className="text-slate-400 mb-8">Only administrators can access the scanner</p>
-          <Link href="/" className="px-6 py-3 rounded-xl font-bold bg-maroon-700 text-white hover:bg-maroon-800 transition-colors inline-block">
-            Go Home
-          </Link>
+          <p className="text-slate-400 mb-8">Only administrators or scanner accounts can access the scanner.</p>
+          <div className="flex items-center justify-center gap-3">
+            <Link href="/scan/login" className="px-6 py-3 rounded-xl font-bold bg-maroon-700 text-white hover:bg-maroon-800 transition-colors inline-block">
+              Scanner Login
+            </Link>
+            <Link href="/" className="px-6 py-3 rounded-xl font-bold border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors inline-block">
+              Go Home
+            </Link>
+          </div>
         </motion.div>
       </div>
     );

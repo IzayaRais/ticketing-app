@@ -11,7 +11,7 @@ export const registrationSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   phone: z
     .string()
-    .regex(/^\+880[1-9]\d{9}$/, "Phone must be in format: +880 1XXXXXXXXX"),
+    .regex(/^(?:\+880\s?|0)1[3-9]\d{8}$/, "Phone must be in format: +8801XXXXXXXXX or 01XXXXXXXXX"),
   studentId: z
     .string()
     .regex(/^[A-Za-z0-9]{5,15}$/, "Student ID must be 5-15 alphanumeric characters"),
@@ -20,12 +20,15 @@ export const registrationSchema = z.object({
   bloodGroup: z.string().min(1, "Please select your blood group"),
   paymentMethod: z.enum(paymentMethodOptions).optional(),
   transactionId: z.string().trim().optional(),
+  paymentFromNumber: z.string().trim().optional(),
   terms: z.boolean().refine((val) => val === true, {
     message: "You must agree to the terms and conditions",
   }),
 }).superRefine((data, ctx) => {
   const needsPayment = data.university === "BUP" || data.university === "AFMC";
   const transactionId = (data.transactionId || "").trim();
+  const paymentFromNumber = (data.paymentFromNumber || "").trim();
+  const validBanglaPhone = /^(?:\+880\s?|0)1[3-9]\d{8}$/;
 
   if (needsPayment) {
     if (!data.paymentMethod) {
@@ -47,6 +50,20 @@ export const registrationSchema = z.object({
         code: "custom",
         path: ["transactionId"],
         message: "Transaction ID must be 6-40 characters (letters, numbers, hyphen)",
+      });
+    }
+
+    if (!paymentFromNumber) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["paymentFromNumber"],
+        message: "Please enter the number used for payment",
+      });
+    } else if (!validBanglaPhone.test(paymentFromNumber)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["paymentFromNumber"],
+        message: "Payment number must be in format: +8801XXXXXXXXX or 01XXXXXXXXX",
       });
     }
   }

@@ -5,6 +5,9 @@ import { getAllTickets } from "@/lib/googleSheets";
 import type { AttendeeRow } from "@/types/attendee";
 import { adminTicketSchema } from "@/lib/validations";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -60,6 +63,10 @@ export async function GET() {
       stats: {
         byUniversity: universityStats,
         byBloodGroup: bloodGroupStats,
+      },
+    }, {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
       },
     });
   } catch (error) {

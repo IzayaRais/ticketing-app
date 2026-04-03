@@ -8,7 +8,7 @@ async function requireAdmin() {
   if (!session?.user) {
     return { error: NextResponse.json({ message: "Unauthorized" }, { status: 401 }) };
   }
-  if (session.user.role !== "admin") {
+  if (session.user.role !== "admin" && session.user.role !== "scanner") {
     return { error: NextResponse.json({ message: "Forbidden" }, { status: 403 }) };
   }
   return { session };

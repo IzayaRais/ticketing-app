@@ -27,10 +27,18 @@ interface Ticket {
   paymentMethod: string;
   transactionId: string;
   paymentNumber: string;
+  paymentFromNumber: string;
   status: string;
   timestamp: string;
   checkedIn: string;
   checkedInAt: string;
+}
+
+interface ScannerUser {
+  email: string;
+  createdAt: string;
+  createdBy: string;
+  active: string;
 }
 
 const universities = ["MIST", "BUP", "AFMC"];
@@ -59,6 +67,10 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<{ total: number; male: number; female: number; other: number; scanned: number; notScanned: number; stats: { byUniversity: Record<string, number>; byBloodGroup: Record<string, number> } } | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilterCount, setActiveFilterCount] = useState(0);
+  const [scannerUsers, setScannerUsers] = useState<ScannerUser[]>([]);
+  const [scannerEmail, setScannerEmail] = useState("");
+  const [scannerPassword, setScannerPassword] = useState("");
+  const [scannerMessage, setScannerMessage] = useState("");
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -68,9 +80,18 @@ export default function AdminDashboard() {
         return;
       }
       fetchData();
+      fetchScannerUsers();
     } else if (status === "unauthenticated") {
       setLoading(false);
     }
+  }, [status, session]);
+
+  useEffect(() => {
+    if (status !== "authenticated" || session?.user?.role !== "admin") return;
+    const interval = setInterval(() => {
+      fetchData();
+    }, 15000);
+    return () => clearInterval(interval);
   }, [status, session]);
 
   useEffect(() => {
@@ -94,7 +115,7 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("/api/admin/tickets");
+      const res = await fetch("/api/admin/tickets", { cache: "no-store" });
       const data = await res.json();
       setTickets(data.tickets || []);
       setStats(data);
@@ -102,6 +123,39 @@ export default function AdminDashboard() {
       console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchScannerUsers = async () => {
+    try {
+      const res = await fetch("/api/admin/scanner-users", { cache: "no-store" });
+      const data = await res.json();
+      if (res.ok) setScannerUsers(data.users || []);
+    } catch (error) {
+      console.error("Error fetching scanner users:", error);
+    }
+  };
+
+  const handleCreateScanner = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setScannerMessage("");
+    try {
+      const res = await fetch("/api/admin/scanner-users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: scannerEmail, password: scannerPassword }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setScannerMessage(data.message || "Failed to save scanner user.");
+        return;
+      }
+      setScannerMessage("Scanner user saved successfully.");
+      setScannerEmail("");
+      setScannerPassword("");
+      fetchScannerUsers();
+    } catch {
+      setScannerMessage("Failed to save scanner user.");
     }
   };
 
@@ -123,7 +177,8 @@ export default function AdminDashboard() {
         t.ticketId.toLowerCase().includes(search.toLowerCase()) ||
         t.studentId.toLowerCase().includes(search.toLowerCase()) ||
         (t.paymentMethod || "").toLowerCase().includes(search.toLowerCase()) ||
-        (t.transactionId || "").toLowerCase().includes(search.toLowerCase());
+        (t.transactionId || "").toLowerCase().includes(search.toLowerCase()) ||
+        (t.paymentFromNumber || "").toLowerCase().includes(search.toLowerCase());
       const matchesGender = genderFilter === "all" || t.gender === genderFilter;
       const matchesUniversity = universityFilter === "all" || t.university === universityFilter;
       const matchesBloodGroup = bloodGroupFilter === "all" || t.bloodGroup === bloodGroupFilter;
@@ -169,12 +224,12 @@ export default function AdminDashboard() {
     });
 
   const downloadCSV = () => {
-    const headers = ["Ticket ID", "Full Name", "Email", "Phone", "Student ID", "University", "Gender", "Blood Group", "Payment Method", "Transaction ID", "Payment Number", "Status", "Timestamp"];
+    const headers = ["Ticket ID", "Full Name", "Email", "Phone", "Student ID", "University", "Gender", "Blood Group", "Payment Method", "Transaction ID", "Payment Number", "Payment From Number", "Status", "Timestamp"];
     const csvContent = [
       headers.join(","),
       ...filteredTickets.map(t => [
         t.ticketId, t.fullName, t.email, t.phone, t.studentId, 
-        t.university, t.gender, t.bloodGroup, t.paymentMethod || "", t.transactionId || "", t.paymentNumber || "", t.status, t.timestamp
+        t.university, t.gender, t.bloodGroup, t.paymentMethod || "", t.transactionId || "", t.paymentNumber || "", t.paymentFromNumber || "", t.status, t.timestamp
       ].map(v => `"${v}"`).join(","))
     ].join("\n");
 
@@ -689,7 +744,12 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-4 py-3 hidden xl:table-cell">
                         {ticket.transactionId ? (
-                          <span className="font-mono text-xs font-bold text-slate-700">{ticket.transactionId}</span>
+                          <div className="space-y-1">
+                            <p className="font-mono text-xs font-bold text-slate-700">{ticket.transactionId}</p>
+                            {ticket.paymentFromNumber ? (
+                              <p className="text-[11px] text-slate-500">From: {ticket.paymentFromNumber}</p>
+                            ) : null}
+                          </div>
                         ) : (
                           <span className="text-xs font-semibold text-slate-400">N/A</span>
                         )}
@@ -732,6 +792,74 @@ export default function AdminDashboard() {
                 {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
               </span>
             </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+          className="bg-white rounded-2xl p-4 md:p-6 shadow-lg border border-slate-100 mb-6"
+        >
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <div>
+              <h3 className="font-black text-slate-800">Scanner Users</h3>
+              <p className="text-xs text-slate-500">Create extra scanning accounts (email + password).</p>
+            </div>
+            <Link href="/scan/login" className="text-xs font-bold text-maroon-700 hover:underline">Open Scanner Login</Link>
+          </div>
+
+          <form onSubmit={handleCreateScanner} className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            <input
+              type="email"
+              value={scannerEmail}
+              onChange={(e) => setScannerEmail(e.target.value)}
+              placeholder="scanner@email.com"
+              className="px-3 py-2.5 rounded-xl border border-slate-200 text-sm"
+              required
+            />
+            <input
+              type="password"
+              value={scannerPassword}
+              onChange={(e) => setScannerPassword(e.target.value)}
+              placeholder="Password (min 6)"
+              className="px-3 py-2.5 rounded-xl border border-slate-200 text-sm"
+              required
+            />
+            <button
+              type="submit"
+              className="px-4 py-2.5 rounded-xl bg-maroon-700 text-white text-sm font-bold hover:bg-maroon-800"
+            >
+              Save Scanner User
+            </button>
+          </form>
+
+          {scannerMessage && <p className="text-xs font-medium text-slate-600 mb-3">{scannerMessage}</p>}
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-slate-500">
+                  <th className="py-2">Email</th>
+                  <th className="py-2">Created By</th>
+                  <th className="py-2">Created At</th>
+                </tr>
+              </thead>
+              <tbody>
+                {scannerUsers.map((u) => (
+                  <tr key={u.email} className="border-t border-slate-100">
+                    <td className="py-2 font-medium text-slate-700">{u.email}</td>
+                    <td className="py-2 text-slate-600">{u.createdBy || "-"}</td>
+                    <td className="py-2 text-slate-500">{u.createdAt ? new Date(u.createdAt).toLocaleString("en-GB") : "-"}</td>
+                  </tr>
+                ))}
+                {scannerUsers.length === 0 && (
+                  <tr>
+                    <td colSpan={3} className="py-3 text-slate-400">No scanner users yet.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </motion.div>
       </div>

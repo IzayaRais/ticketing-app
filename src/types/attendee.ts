@@ -10,6 +10,7 @@ export interface AttendeeRow {
   paymentMethod: string;
   transactionId: string;
   paymentNumber: string;
+  paymentFromNumber: string;
   status: string;
   timestamp: string;
   checkedIn: string;

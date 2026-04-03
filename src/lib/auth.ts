@@ -2,6 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { signInSchema } from "@/lib/validations";
+import { validateScannerUser } from "./scannerUsers";
 
 const ADMIN_EMAIL = "raisultensors@gmail.com";
 
@@ -43,6 +44,34 @@ export const authOptions: NextAuthOptions = {
         };
       },
     }),
+    CredentialsProvider({
+      id: "scanner-credentials",
+      name: "Scanner Login",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
+
+        const validation = signInSchema.safeParse({
+          email: credentials.email,
+          password: credentials.password,
+        });
+
+        if (!validation.success) return null;
+
+        const valid = await validateScannerUser(credentials.email, credentials.password);
+        if (!valid) return null;
+
+        return {
+          id: credentials.email.toLowerCase(),
+          email: credentials.email.toLowerCase(),
+          name: "Scanner User",
+          role: "scanner" as const,
+        };
+      },
+    }),
   ],
   pages: {
     signIn: "/auth/signin",
@@ -62,7 +91,7 @@ export const authOptions: NextAuthOptions = {
           const email = user.email?.toLowerCase();
           token.role = email === ADMIN_EMAIL.toLowerCase() ? "admin" : "user";
         } else {
-          token.role = "user";
+          token.role = user.role || "user";
         }
       }
       return token;

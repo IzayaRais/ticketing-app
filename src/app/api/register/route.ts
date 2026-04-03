@@ -59,7 +59,9 @@ export async function POST(request: Request) {
     const { data } = result;
     const normalizedData = {
       ...data,
+      phone: data.phone.replace(/\s+/g, ""),
       transactionId: data.transactionId?.trim().toUpperCase() || "",
+      paymentFromNumber: data.paymentFromNumber?.replace(/\s+/g, "") || "",
     };
 
     const existing = await getTicketByEmail(normalizedData.email);

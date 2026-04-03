@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Gate Scanner | Antorip Farewell Concert 2026",
+  title: "Gate Scanner | অন্তরীপ ২১ Farewell Concert 2026",
   description: "Scan attendee QR codes for entry verification.",
   robots: "noindex, nofollow",
 };
@@ -13,3 +13,4 @@ export default function ScanLayout({
 }) {
   return <>{children}</>;
 }
+

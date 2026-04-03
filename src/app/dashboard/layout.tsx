@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Dashboard | Antorip Farewell Concert 2026",
-  description: "Access your ticket and manage your registration for the Antorip Farewell Concert.",
+  title: "Dashboard | অন্তরীপ ২১ Farewell Concert 2026",
+  description: "Access your ticket and manage your registration for the অন্তরীপ ২১ Farewell Concert.",
 };
 
 export default function DashboardLayout({
@@ -12,3 +12,4 @@ export default function DashboardLayout({
 }) {
   return <>{children}</>;
 }
+

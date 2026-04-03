@@ -1,13 +1,18 @@
-import React from "react";
-import { Document, Page, Text, View, StyleSheet, renderToBuffer, Image } from "@react-pdf/renderer";
+﻿import React from "react";
+import { Document, Page, Text, View, StyleSheet, renderToBuffer, Image, Font } from "@react-pdf/renderer";
 import QRCode from "qrcode";
 import { RegistrationData } from "./validations";
+
+Font.register({
+  family: "AnekBangla",
+  src: "https://raw.githubusercontent.com/google/fonts/main/ofl/anekbangla/static/AnekBangla-Regular.ttf",
+});
 
 const styles = StyleSheet.create({
   page: {
     padding: 0,
     backgroundColor: "#FAFAFA",
-    fontFamily: "Helvetica",
+    fontFamily: "AnekBangla",
   },
   container: {
     flex: 1,
@@ -332,7 +337,7 @@ const TicketDocument = ({ data, ticketId, qrCodeUrl }: { data: RegistrationData;
           <View style={styles.topSection}>
             <View style={styles.header}>
               <View style={styles.headerLeft}>
-                <Text style={styles.eventTag}>Antorip 2026 Presents</Text>
+                <Text style={styles.eventTag}>অন্তরীপ ২১ 2026 Presents</Text>
                 <Text style={styles.title}>The Farewell</Text>
                 <Text style={styles.subtitle}>A Memorable Musical Experience</Text>
               </View>
@@ -412,16 +417,16 @@ const TicketDocument = ({ data, ticketId, qrCodeUrl }: { data: RegistrationData;
             <View>
               <Text style={styles.instructionTitle}>Entry Requirements</Text>
               <Text style={styles.instructionText}>
-                • Present original student ID{'\n'}
-                • This pass is non-transferable and tied to your identity{'\n'}
-                • Gate opens at 1:00 PM - please arrive early{'\n'}
-                • No outside food or beverages allowed{'\n'}
-                • Follow venue staff instructions at all times
+                - Present original student ID{'\n'}
+                - This pass is non-transferable and tied to your identity{'\n'}
+                - Gates open at 1:00 PM. Please arrive early{'\n'}
+                - No outside food or beverages allowed{'\n'}
+                - Follow venue staff instructions at all times
               </Text>
             </View>
             <View style={styles.bottomBarcode}>
               <Text style={styles.copyright}>
-                MIST Central Field, Mirpur Cantonment, Dhaka • 2026 • Antorip Farewell Concert
+                MIST Central Field, Mirpur Cantonment, Dhaka - 2026 - অন্তরীপ ২১ Farewell Concert
               </Text>
             </View>
           </View>
@@ -442,3 +447,4 @@ export async function generateTicketPdf(data: RegistrationData, ticketId: string
     throw error;
   }
 }
+

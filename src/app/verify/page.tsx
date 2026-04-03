@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -131,10 +131,11 @@ export default function VerifyPage() {
           </div>
 
           <p className="text-center text-xs text-slate-400 font-semibold uppercase tracking-widest mt-10">
-            Antorip Farewell Concert · Secure Entry Portal
+            অন্তরীপ ২১ Farewell Concert Â· Secure Entry Portal
           </p>
         </motion.div>
       </div>
     </main>
   );
 }
+

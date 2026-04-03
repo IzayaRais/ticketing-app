@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState, Suspense } from "react";
 import { useSession, signIn } from "next-auth/react";
@@ -109,13 +109,13 @@ function DashboardContent() {
               >
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-maroon-500/10 rounded-full mb-6">
                   <Sparkles className="w-4 h-4 text-maroon-500" />
-                  <span className="text-xs font-bold text-maroon-500 uppercase tracking-wider">Antorip 2026</span>
+                  <span className="text-xs font-bold text-maroon-500 uppercase tracking-wider">অন্তরীপ ২১ 2026</span>
                 </div>
                 <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
                   Secure Your <span className="text-maroon-500">Invite</span>
                 </h1>
                 <p className="text-slate-300 font-medium text-lg max-w-2xl mx-auto">
-                  Sign in with Google or verify your entry code to access the Antorip Farewell Concert registration portal.
+                  Sign in with Google or verify your entry code to access the অন্তরীপ ২১ Farewell Concert registration portal.
                 </p>
               </motion.div>
             </div>
@@ -146,7 +146,7 @@ function DashboardContent() {
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
                       <Clock className="w-5 h-5 text-maroon-600" />
-                      <span className="text-sm font-bold text-slate-700">Gate Opens: 1:00 PM</span>
+                      <span className="text-sm font-bold text-slate-700">Gates Open: 1:00 PM</span>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
                       <CheckCircle className="w-5 h-5 text-green-600" />
@@ -224,7 +224,7 @@ function DashboardContent() {
                   </h1>
                   <p className="text-slate-300 font-medium mt-2 max-w-lg">
                     {existingTicket 
-                      ? "Your entry protocol for the Antorip Farewell Concert is cleared." 
+                      ? "Your entry protocol for the অন্তরীপ ২১ Farewell Concert is cleared." 
                       : "Welcome! Please provide your student information to finalize your registration."}
                   </p>
                 </div>
@@ -356,3 +356,4 @@ export default function Dashboard() {
     </main>
   );
 }
+

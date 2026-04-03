@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Verify Ticket | Antorip Farewell Concert 2026",
-  description: "Verify your entry pass for the Antorip Farewell Concert.",
+  title: "Verify Ticket | অন্তরীপ ২১ Farewell Concert 2026",
+  description: "Verify your entry pass for the অন্তরীপ ২১ Farewell Concert.",
 };
 
 export default function VerifyLayout({
@@ -12,3 +12,4 @@ export default function VerifyLayout({
 }) {
   return <>{children}</>;
 }
+

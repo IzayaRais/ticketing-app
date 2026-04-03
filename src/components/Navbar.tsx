@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -58,7 +58,7 @@ export default function Navbar() {
             <Ticket className="w-5 h-5 text-white" />
           </div>
           <div className="leading-tight">
-            <span className="block text-lg font-black text-maroon-950 tracking-tight leading-none">Antorip</span>
+            <span className="block text-lg font-black text-maroon-950 tracking-tight leading-none">অন্তরীপ ২১</span>
             <span className="block text-[11px] font-bold text-maroon-600/60 uppercase tracking-[0.2em] mt-0.5">Farewell</span>
           </div>
         </Link>
@@ -184,3 +184,4 @@ export default function Navbar() {
     </header>
   );
 }
+

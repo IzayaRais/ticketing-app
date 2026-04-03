@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -98,7 +98,7 @@ function SuccessContent() {
             <div className="flex items-center gap-3">
               <Ticket className="w-5 h-5 text-white/70" />
               <span className="text-white/70 text-sm font-bold uppercase tracking-widest">
-                Antorip Farewell · Concert Pass
+                অন্তরীপ ২১ Farewell Â· Concert Pass
               </span>
             </div>
             <div className="flex gap-2">
@@ -115,7 +115,7 @@ function SuccessContent() {
             </p>
             <div className="flex items-center gap-3">
               <span className="text-4xl md:text-5xl font-black text-maroon-700 tracking-[0.12em]">
-                {ticketId || "—"}
+                {ticketId || "â€”"}
               </span>
               <button
                 onClick={copyId}
@@ -173,7 +173,7 @@ function SuccessContent() {
             ) : (
               <Download className="w-5 h-5" />
             )}
-            {isDownloading ? "Generating…" : "Download PDF"}
+            {isDownloading ? "Generatingâ€¦" : "Download PDF"}
           </button>
 
           <Link href="/" className="btn-outline justify-center py-4 rounded-xl">
@@ -205,3 +205,4 @@ export default function SuccessPage() {
     </main>
   );
 }
+

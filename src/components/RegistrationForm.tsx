@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { memo, useState, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -70,6 +70,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
   const [step, setStep] = useState(0);
   const [selectedInstitute, setSelectedInstitute] = useState<Institute | null>(null);
   const [copiedPaymentNumber, setCopiedPaymentNumber] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
   const router = useRouter();
 
   const {
@@ -336,7 +337,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
                   Payment Required ({university})
                 </p>
                 <p className="text-sm text-slate-600">
-                  Payment amount: <span className="font-bold">200 BDT</span>.
+                  Payment amount: <span className="font-bold">100tk</span>.
                 </p>
                 <p className="text-sm text-slate-600 mt-1">
                   Send payment via bKash or Nagad to{" "}
@@ -440,10 +441,27 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
                 </div>
               </div>
               <span className="text-sm text-slate-500 leading-relaxed">
-                I confirm all information is accurate and agree to the <span className="text-maroon-700 font-semibold">terms and conditions</span>.
+                I confirm all information is accurate and agree to the{" "}
+                <button
+                  type="button"
+                  onClick={() => setShowTerms((prev) => !prev)}
+                  className="text-maroon-700 font-semibold underline underline-offset-2 hover:text-maroon-800"
+                >
+                  terms and conditions
+                </button>.
               </span>
             </label>
             {errors.terms && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.terms.message}</p>}
+            {showTerms && (
+              <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 space-y-2">
+                <p className="font-bold text-slate-800">Sample Terms & Conditions</p>
+                <p>1. Every registration is for one person only and cannot be transferred.</p>
+                <p>2. Your ticket may be cancelled if submitted information or payment proof is invalid.</p>
+                <p>3. Entry requires original student ID and valid ticket verification at the gate.</p>
+                <p>4. Gates open at 1:00 PM. Please arrive early to avoid queue delays.</p>
+                <p>5. Event authority may deny entry for misconduct or safety violations.</p>
+              </div>
+            )}
           </div>
 
           <div className="flex gap-3 mt-2">
@@ -471,3 +489,4 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
     </form>
   );
 }
+

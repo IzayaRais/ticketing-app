@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import { registrationSchema } from "@/lib/validations";
 import { appendToSheet, getTicketByEmail } from "@/lib/googleSheets";
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
     
     await sendEmail({
       to: normalizedData.email,
-      subject: "Your Antorip Farewell Concert Entry Pass",
+      subject: "Your অন্তরীপ ২১ Farewell Concert Entry Pass",
       html: emailHtml,
       attachments: [
         {
@@ -112,3 +112,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

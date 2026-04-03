@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
@@ -52,7 +52,7 @@ export default function TicketCard({ ticket, onDownload }: { ticket: TicketData;
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Ticket Holder</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-black text-slate-800">Your Ticket</h1>
-            <p className="text-slate-500 font-medium mt-1">Antorip Farewell Concert 2026 - Registration Confirmed</p>
+            <p className="text-slate-500 font-medium mt-1">অন্তরীপ ২১ Farewell Concert 2026 - Registration Confirmed</p>
           </div>
           <button
             onClick={onDownload}
@@ -95,7 +95,7 @@ export default function TicketCard({ ticket, onDownload }: { ticket: TicketData;
                   <div className="flex items-start gap-3">
                     <Calendar className="w-4 h-4 text-maroon-300 mt-0.5" />
                     <div>
-                      <p className="text-xs font-bold text-white">Gate Opens: 1:00 PM</p>
+                      <p className="text-xs font-bold text-white">Gates Open: 1:00 PM</p>
                       <p className="text-[10px] text-maroon-200">Evening Session</p>
                     </div>
                   </div>
@@ -172,3 +172,4 @@ export default function TicketCard({ ticket, onDownload }: { ticket: TicketData;
     </motion.div>
   );
 }
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -67,13 +67,6 @@ export default function LandingPage() {
     { label: "Experience", value: "Central Base", icon: <Star className="w-4 h-4" /> },
   ];
 
-  const sponsors = [
-    { name: "Global Tech", type: "Platinum", logo: "GT" },
-    { name: "Nova Soft", type: "Gold", logo: "NS" },
-    { name: "Eco Energy", type: "Sustainability", logo: "EE" },
-    { name: "Cloud Sync", type: "Digital", logo: "CS" },
-  ];
-
   const artists = [
     { name: "Headliner Band", genre: "To Be Announced", icon: <Mic2 className="w-6 h-6 text-maroon-700" /> },
     { name: "Special Guest", genre: "Mystery Performance", icon: <Radio className="w-6 h-6 text-maroon-700" /> },
@@ -100,13 +93,13 @@ export default function LandingPage() {
             >
               <div className="flex items-center gap-2 mb-6">
                 <span className="px-4 py-1.5 bg-maroon-700/10 text-maroon-700 text-xs font-black uppercase tracking-widest rounded-full border border-maroon-700/10">
-                  Farewell Event · 2026
+                  Farewell Event Â· 2026
                 </span>
                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
               </div>
 
               <h1 className="text-6xl md:text-8xl font-black text-maroon-950 tracking-tighter leading-[0.9] mb-8">
-                Antorip <br />
+                অন্তরীপ ২১ <br />
                 <span className="text-maroon-700">Farewell</span>
               </h1>
 
@@ -168,7 +161,7 @@ export default function LandingPage() {
                   </div>
                 </div>
                 {/* Decorative pass ID */}
-                <div className="absolute top-12 right-0 rotate-90 origin-right text-[10px] font-black text-white/20 tracking-[0.5em] uppercase">ACCESS PASS // ANTORIP 09 // 04 // 26</div>
+                <div className="absolute top-12 right-0 rotate-90 origin-right text-[10px] font-black text-white/20 tracking-[0.5em] uppercase">ACCESS PASS // অন্তরীপ ২১ 09 // 04 // 26</div>
               </div>
             </motion.div>
           </div>
@@ -210,16 +203,8 @@ export default function LandingPage() {
               <p className="text-[10px] font-black text-maroon-700 uppercase tracking-[0.3em] mb-4">Strategic Partners</p>
               <h4 className="text-2xl font-black text-slate-900 tracking-tight">Project Sponsors</h4>
             </div>
-            <div className="flex-1 flex flex-wrap items-center justify-center md:justify-start gap-12 opacity-30 group">
-              {sponsors.map((sponsor) => (
-                <div key={sponsor.name} className="flex items-center gap-3 grayscale hover:grayscale-0 transition-all cursor-crosshair">
-                  <div className="w-10 h-10 bg-slate-900 text-white rounded-lg flex items-center justify-center font-black text-xs">{sponsor.logo}</div>
-                  <div>
-                    <p className="text-xs font-black uppercase text-slate-900">{sponsor.name}</p>
-                    <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{sponsor.type}</p>
-                  </div>
-                </div>
-              ))}
+            <div className="flex-1 flex items-center justify-center md:justify-start">
+              <p className="text-2xl font-black text-slate-400 uppercase tracking-[0.2em]">TBA</p>
             </div>
           </div>
         </div>
@@ -260,27 +245,30 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="relative group">
-              <div className="absolute -inset-2 bg-gradient-to-tr from-maroon-700/20 to-amber-500/20 rounded-[40px] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-              <div className="relative bg-white p-4 rounded-[40px] shadow-2xl border border-slate-100">
-                <div className="relative rounded-[32px] overflow-hidden aspect-[16/11]">
-                  <div className="absolute inset-0 bg-[#f1f5f9]">
-                    <img
-                      src="https://www.google.com/maps/vt/pb=!1m4!1m3!1i15!2i23684!3i12484!2m3!1e0!2sm!3i667055182!3m8!2sen!3sBD!5e1105!12m4!1e68!2m2!1sset!2sRoadmap!4e0!5m1!1e0"
-                      alt="Venue Map"
-                      className="w-full h-full object-cover grayscale opacity-60 mix-blend-multiply"
-                    />
-                    <div className="absolute inset-0 bg-maroon-900/10 pointer-events-none" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="p-10 bg-white/90 backdrop-blur-xl rounded-[40px] shadow-2xl border border-white flex flex-col items-center max-w-[320px] text-center">
-                        <div className="w-16 h-16 bg-maroon-700 rounded-2xl flex items-center justify-center text-white mb-6 animate-bounce shadow-xl shadow-maroon-700/20">
-                          <MapPin className="w-8 h-8" />
-                        </div>
-                        <p className="text-2xl font-black text-maroon-950 tracking-tighter mb-2 leading-none uppercase">Main Stage</p>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Central Field · 09.04.26</p>
-                      </div>
-                    </div>
-                  </div>
+            <div className="relative">
+              <div className="bg-white p-4 rounded-[32px] shadow-2xl border border-slate-100">
+                <div className="rounded-[24px] overflow-hidden aspect-[16/11] border border-slate-200">
+                  <iframe
+                    title="MIST Central Field Map"
+                    src="https://www.google.com/maps?q=MIST%20Central%20Field%2C%20Dhaka&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="w-full h-full"
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-3 mt-3 px-2">
+                  <p className="text-sm font-bold text-slate-700">Live Venue Map - MIST Central Field</p>
+                  <a
+                    href="https://maps.app.goo.gl/HyPzkDY4TNR7pjGq7"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-bold text-maroon-700 hover:text-maroon-800 underline"
+                  >
+                    Open Full Map
+                  </a>
                 </div>
               </div>
             </div>
@@ -337,12 +325,12 @@ export default function LandingPage() {
                   <Ticket className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black">Antorip</h3>
+                  <h3 className="text-xl font-black">অন্তরীপ ২১</h3>
                   <p className="text-xs text-maroon-400 font-bold uppercase tracking-wider">Farewell 2026</p>
                 </div>
               </div>
               <p className="text-slate-400 text-sm mb-6 max-w-sm">
-                The official ticketing platform for Antorip Farewell Concert 2026. Secure your spot at the most anticipated musical event of the year.
+                The official ticketing platform for অন্তরীপ ২১ Farewell Concert 2026. Secure your spot at the most anticipated musical event of the year.
               </p>
               <div className="flex gap-4">
                 <a href="mailto:raisultensors@gmail.com" className="w-10 h-10 bg-slate-800 hover:bg-maroon-600 rounded-lg flex items-center justify-center transition-colors">
@@ -383,7 +371,7 @@ export default function LandingPage() {
                 <li className="text-slate-400 text-sm">April 09, 2026</li>
                 <li className="text-slate-400 text-sm">MIST Central Field</li>
                 <li className="text-slate-400 text-sm">Mirpur Cantonment, Dhaka</li>
-                <li className="text-slate-400 text-sm">Gate opens 1:00 PM</li>
+                <li className="text-slate-400 text-sm">Gates open 1:00 PM</li>
               </ul>
             </div>
           </div>
@@ -391,7 +379,7 @@ export default function LandingPage() {
           <div className="border-t border-slate-800 py-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-slate-500 text-sm">
-                © 2026 Antorip Class &apos;26. All rights reserved.
+                Â© 2026 অন্তরীপ ২১ Class &apos;26. All rights reserved.
               </p>
               <p className="text-slate-600 text-sm">
                 Developed by <a href="https://raisul-islam-ratul.vercel.app" target="_blank" rel="noopener noreferrer" className="text-maroon-400 hover:text-maroon-300 font-bold transition-colors">Raisul Islam Ratul</a>
@@ -403,3 +391,4 @@ export default function LandingPage() {
     </main>
   );
 }
+

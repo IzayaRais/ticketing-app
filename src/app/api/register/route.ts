@@ -85,23 +85,34 @@ export async function POST(request: Request) {
 
     const pdfBuffer = await generateTicketPdf(normalizedData, ticketId);
     const emailHtml = generateTicketEmailHTML(normalizedData.fullName, ticketId);
-    
-    await sendEmail({
-      to: normalizedData.email,
-      subject: "Your অন্তরীপ ২১ Farewell Concert Entry Pass",
-      html: emailHtml,
-      attachments: [
-        {
-          filename: `ticket-${ticketId}.pdf`,
-          content: pdfBuffer,
-        },
-      ],
-    });
+
+    let emailSent = true;
+    try {
+      await sendEmail({
+        to: normalizedData.email,
+        subject: "Your অন্তরীপ ২১ Farewell Concert Entry Pass",
+        html: emailHtml,
+        attachments: [
+          {
+            filename: `ticket-${ticketId}.pdf`,
+            content: pdfBuffer,
+          },
+        ],
+      });
+    } catch (emailError) {
+      emailSent = false;
+      const emailMessage =
+        emailError instanceof Error ? emailError.message : "Unknown email error";
+      console.error("Registration completed but email send failed:", emailMessage);
+    }
 
     return NextResponse.json({
-      message: "Registration successful",
+      message: emailSent
+        ? "Registration successful"
+        : "Registration successful, but email delivery failed. Please download your ticket from the success page.",
       ticketId,
       email: normalizedData.email,
+      emailSent,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";

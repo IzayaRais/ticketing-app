@@ -49,6 +49,7 @@ export default function ScanPage() {
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const lastScanRef = useRef("");
   const processingRef = useRef(false);
+  const mountedRef = useRef(true);
 
   const processTicket = useCallback(async (ticketId: string) => {
     if (processingRef.current) return;
@@ -138,12 +139,40 @@ export default function ScanPage() {
     setManualId("");
   };
 
+  const startScannerWithFallback = useCallback(async (scanner: Html5Qrcode, preferredDeviceId?: string) => {
+    const config = {
+      fps: 10,
+      qrbox: { width: 260, height: 260 },
+      aspectRatio: 1,
+    };
+
+    const attempts: Array<{ label: string; source: string | { facingMode: "environment" } | { deviceId: { exact: string } } }> = [];
+
+    if (preferredDeviceId) {
+      attempts.push({ label: "preferred-device", source: { deviceId: { exact: preferredDeviceId } } });
+    }
+    attempts.push({ label: "rear-camera", source: { facingMode: "environment" } });
+    attempts.push({ label: "default-camera", source: "environment" });
+
+    let lastError: unknown = null;
+    for (const attempt of attempts) {
+      try {
+        await scanner.start(attempt.source as never, config, handleScan, () => {});
+        return;
+      } catch (err) {
+        lastError = err;
+      }
+    }
+    throw lastError || new Error("Unable to start scanner camera.");
+  }, [handleScan]);
+
   useEffect(() => {
     if (
       status !== "authenticated" ||
       (session?.user?.role !== "admin" && session?.user?.role !== "scanner")
     ) return;
 
+    mountedRef.current = true;
     let scanner: Html5Qrcode | null = null;
     let cancelled = false;
 
@@ -168,18 +197,12 @@ export default function ScanPage() {
         scanner = new Html5Qrcode("qr-reader", { verbose: false });
         scannerRef.current = scanner;
 
-        await scanner.start(
-          { deviceId: { exact: cameraId } },
-          {
-            fps: 10,
-            qrbox: { width: 250, height: 250 },
-            aspectRatio: 1,
-          },
-          handleScan,
-          () => {}
-        );
+        await startScannerWithFallback(scanner, cameraId);
 
-        if (!cancelled) setCameraReady(true);
+        if (!cancelled && mountedRef.current) {
+          setCameraReady(true);
+          setCameraError(null);
+        }
       } catch (err: unknown) {
         if (cancelled) return;
         const msg = err instanceof Error ? err.message : "Unknown error";
@@ -197,12 +220,13 @@ export default function ScanPage() {
 
     return () => {
       cancelled = true;
+      mountedRef.current = false;
       if (scanner) {
         scanner.stop().catch(() => {});
         scannerRef.current = null;
       }
     };
-  }, [status, session, handleScan]);
+  }, [status, session, startScannerWithFallback]);
 
   const switchCamera = async (deviceId: string) => {
     if (!scannerRef.current) return;
@@ -215,13 +239,9 @@ export default function ScanPage() {
     setCameraReady(false);
 
     try {
-      await scannerRef.current.start(
-        { deviceId: { exact: deviceId } },
-        { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1 },
-        handleScan,
-        () => {}
-      );
+      await startScannerWithFallback(scannerRef.current, deviceId);
       setCameraReady(true);
+      setCameraError(null);
     } catch {
       setCameraError("Failed to switch camera");
     }

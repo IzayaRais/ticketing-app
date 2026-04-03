@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { memo, useState, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registrationSchema, RegistrationData } from "@/lib/validations";
@@ -21,7 +21,7 @@ import {
 const bloodGroups = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"] as const;
 const genders = ["Male", "Female"] as const;
 
-function SelectField({
+const SelectField = memo(function SelectField({
   label,
   value,
   onChange,
@@ -61,7 +61,7 @@ function SelectField({
       {error && <p className="text-xs font-medium text-red-500 mt-1.5">{error}</p>}
     </div>
   );
-}
+});
 
 export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId: string, email: string) => void }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -82,6 +82,8 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
     formState: { errors },
   } = useForm<RegistrationData>({
     resolver: zodResolver(registrationSchema),
+    mode: "onSubmit",
+    reValidateMode: "onSubmit",
     defaultValues: { terms: false },
   });
 
@@ -93,7 +95,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
       const stored = sessionStorage.getItem(SELECTED_INSTITUTE_KEY) as Institute | null;
       if (stored && institutes.includes(stored)) {
         setSelectedInstitute(stored);
-        setValue("university", stored, { shouldValidate: true });
+        setValue("university", stored, { shouldDirty: true });
       }
     };
 
@@ -104,9 +106,9 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
 
   useEffect(() => {
     if (!requiresPayment) {
-      setValue("paymentMethod", undefined, { shouldValidate: true });
-      setValue("transactionId", "", { shouldValidate: true });
-      setValue("paymentFromNumber", "", { shouldValidate: true });
+      setValue("paymentMethod", undefined);
+      setValue("transactionId", "");
+      setValue("paymentFromNumber", "");
     }
   }, [requiresPayment, setValue]);
 
@@ -273,7 +275,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
             <SelectField
               label="University"
               value={getValues("university") || ""}
-              onChange={(val) => setValue("university", val as "MIST" | "BUP" | "AFMC", { shouldValidate: true })}
+              onChange={(val) => setValue("university", val as "MIST" | "BUP" | "AFMC", { shouldDirty: true })}
               options={institutes}
               placeholder="Select your university"
               error={errors.university?.message}
@@ -283,7 +285,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
           <SelectField
             label="Gender"
             value={getValues("gender") || ""}
-            onChange={(val) => setValue("gender", val as "Male" | "Female", { shouldValidate: true })}
+            onChange={(val) => setValue("gender", val as "Male" | "Female", { shouldDirty: true })}
             options={genders}
             placeholder="Select gender"
             error={errors.gender?.message}
@@ -292,7 +294,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
           <SelectField
             label="Blood Group"
             value={getValues("bloodGroup") || ""}
-            onChange={(val) => setValue("bloodGroup", val, { shouldValidate: true })}
+            onChange={(val) => setValue("bloodGroup", val, { shouldDirty: true })}
             options={bloodGroups as unknown as string[]}
             placeholder="Select blood group"
             error={errors.bloodGroup?.message}
@@ -366,7 +368,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
                       <button
                         key={method}
                         type="button"
-                        onClick={() => setValue("paymentMethod", method, { shouldValidate: true })}
+                        onClick={() => setValue("paymentMethod", method, { shouldDirty: true })}
                         className={`rounded-xl border p-3 flex items-center gap-3 text-left transition-all ${
                           active
                             ? "border-maroon-700 bg-white shadow-sm"

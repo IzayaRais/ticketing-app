@@ -49,7 +49,6 @@ export default function ScanPage() {
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const lastScanRef = useRef("");
   const processingRef = useRef(false);
-  const mountedRef = useRef(true);
 
   const processTicket = useCallback(async (ticketId: string) => {
     if (processingRef.current) return;
@@ -172,7 +171,6 @@ export default function ScanPage() {
       (session?.user?.role !== "admin" && session?.user?.role !== "scanner")
     ) return;
 
-    mountedRef.current = true;
     let scanner: Html5Qrcode | null = null;
     let cancelled = false;
 
@@ -199,7 +197,7 @@ export default function ScanPage() {
 
         await startScannerWithFallback(scanner, cameraId);
 
-        if (!cancelled && mountedRef.current) {
+        if (!cancelled) {
           setCameraReady(true);
           setCameraError(null);
         }
@@ -220,7 +218,6 @@ export default function ScanPage() {
 
     return () => {
       cancelled = true;
-      mountedRef.current = false;
       if (scanner) {
         scanner.stop().catch(() => {});
         scannerRef.current = null;

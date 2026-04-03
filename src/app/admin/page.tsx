@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { signIn, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -43,6 +43,21 @@ interface ScannerUser {
   active: string;
 }
 
+interface NotificationItem {
+  id: string;
+  message: string;
+  createdAt: string;
+}
+
+interface LiveActivityItem {
+  id: string;
+  type: "registration" | "scan";
+  ticketId: string;
+  fullName: string;
+  at: string;
+  scannedBy?: string;
+}
+
 const universities = ["MIST", "BUP", "AFMC"];
 const bloodGroups = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
 
@@ -74,6 +89,10 @@ export default function AdminDashboard() {
   const [scannerEmail, setScannerEmail] = useState("");
   const [scannerPassword, setScannerPassword] = useState("");
   const [scannerMessage, setScannerMessage] = useState("");
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [liveActivities, setLiveActivities] = useState<LiveActivityItem[]>([]);
+  const previousSnapshotRef = useRef<Map<string, { checkedIn: string }>>(new Map());
+  const initializedRef = useRef(false);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -120,13 +139,78 @@ export default function AdminDashboard() {
     try {
       const res = await fetch("/api/admin/tickets", { cache: "no-store" });
       const data = await res.json();
-      setTickets(data.tickets || []);
+      const incomingTickets = data.tickets || [];
+      setTickets(incomingTickets);
       setStats(data);
+      processLiveData(incomingTickets);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const normalizeEventDate = (value?: string) => {
+    if (!value) return new Date();
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? new Date() : d;
+  };
+
+  const processLiveData = (incoming: Ticket[]) => {
+    const snapshot = new Map<string, { checkedIn: string }>();
+    const newNotifications: NotificationItem[] = [];
+
+    for (const t of incoming) {
+      snapshot.set(t.ticketId, { checkedIn: t.checkedIn });
+      const prev = previousSnapshotRef.current.get(t.ticketId);
+
+      if (!initializedRef.current) continue;
+
+      if (!prev) {
+        newNotifications.push({
+          id: `reg-${t.ticketId}-${Date.now()}`,
+          message: `New registration: ${t.fullName} (${t.ticketId})`,
+          createdAt: new Date().toISOString(),
+        });
+      } else if (prev.checkedIn !== "true" && t.checkedIn === "true") {
+        newNotifications.push({
+          id: `scan-${t.ticketId}-${Date.now()}`,
+          message: `Ticket scanned: ${t.fullName} (${t.ticketId}) by ${t.scannedBy || "Unknown"}`,
+          createdAt: new Date().toISOString(),
+        });
+      }
+    }
+
+    const allActivities: LiveActivityItem[] = [];
+    for (const t of incoming) {
+      allActivities.push({
+        id: `reg-${t.ticketId}`,
+        type: "registration",
+        ticketId: t.ticketId,
+        fullName: t.fullName,
+        at: t.timestamp,
+      });
+      if (t.checkedIn === "true") {
+        allActivities.push({
+          id: `scan-${t.ticketId}`,
+          type: "scan",
+          ticketId: t.ticketId,
+          fullName: t.fullName,
+          at: t.checkedInAt || t.timestamp,
+          scannedBy: t.scannedBy,
+        });
+      }
+    }
+
+    allActivities.sort((a, b) => normalizeEventDate(b.at).getTime() - normalizeEventDate(a.at).getTime());
+    setLiveActivities(allActivities.slice(0, 20));
+
+    if (newNotifications.length > 0) {
+      setNotifications((prev) => [...newNotifications, ...prev].slice(0, 10));
+    }
+
+    previousSnapshotRef.current = snapshot;
+    initializedRef.current = true;
   };
 
   const fetchScannerUsers = async () => {
@@ -431,6 +515,61 @@ export default function AdminDashboard() {
             </motion.div>
           ))}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-white rounded-2xl p-4 md:p-6 shadow-lg border border-slate-100 mb-6"
+        >
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+            <div>
+              <h3 className="font-black text-slate-800">Live Activity</h3>
+              <p className="text-xs text-slate-500">New registrations and scan events appear here. Use refresh anytime for instant sync.</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setNotifications([])}
+                className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+              >
+                Clear Notifications
+              </button>
+            </div>
+          </div>
+
+          {notifications.length > 0 && (
+            <div className="space-y-2 mb-4">
+              {notifications.map((n) => (
+                <div key={n.id} className="px-3 py-2 rounded-xl bg-maroon-50 border border-maroon-100 text-sm text-maroon-800 font-medium">
+                  {n.message}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="max-h-72 overflow-y-auto border border-slate-100 rounded-xl">
+            {liveActivities.length === 0 ? (
+              <p className="p-4 text-sm text-slate-400">No live activity yet.</p>
+            ) : (
+              liveActivities.map((item) => (
+                <div key={item.id} className="px-4 py-3 border-b border-slate-50 last:border-b-0 flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800">
+                      {item.type === "scan" ? "Scanned" : "Registered"}: {item.fullName}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      {item.ticketId}
+                      {item.type === "scan" && item.scannedBy ? ` • by ${item.scannedBy}` : ""}
+                    </p>
+                  </div>
+                  <p className="text-xs text-slate-400 whitespace-nowrap">
+                    {normalizeEventDate(item.at).toLocaleString("en-GB")}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

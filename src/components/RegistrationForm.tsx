@@ -245,7 +245,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
         </div>
       )}
 
-      {/* Step 2: Academic Info */}
+      {/* Step 2: Academic + Health Info */}
       {step === 1 && (
         <div className="space-y-4">
           <div>
@@ -289,6 +289,15 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
             error={errors.gender?.message}
           />
 
+          <SelectField
+            label="Blood Group"
+            value={getValues("bloodGroup") || ""}
+            onChange={(val) => setValue("bloodGroup", val, { shouldValidate: true })}
+            options={bloodGroups as unknown as string[]}
+            placeholder="Select blood group"
+            error={errors.bloodGroup?.message}
+          />
+
           <div className="flex gap-3 mt-2">
             <button
               type="button"
@@ -300,7 +309,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
             <button
               type="button"
               onClick={async () => {
-                const ok = await trigger(["studentId", "university", "gender"]);
+                const ok = await trigger(["studentId", "university", "gender", "bloodGroup"]);
                 if (ok) setStep(2);
               }}
               className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-maroon-700 text-white rounded-xl font-semibold text-sm hover:bg-maroon-800 transition-colors"
@@ -311,20 +320,15 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
         </div>
       )}
 
-      {/* Step 3: Details & Submit */}
+      {/* Step 3: Payment / Confirmation */}
       {step === 2 && (
         <div className="space-y-4">
-          <SelectField
-            label="Blood Group"
-            value={getValues("bloodGroup") || ""}
-            onChange={(val) => setValue("bloodGroup", val, { shouldValidate: true })}
-            options={bloodGroups as unknown as string[]}
-            placeholder="Select blood group"
-            error={errors.bloodGroup?.message}
-          />
-
           {requiresPayment && (
             <div className="space-y-4 rounded-2xl border border-amber-200 bg-amber-50/60 p-4">
+              <div className="pb-1 border-b border-amber-200/70">
+                <p className="text-base font-black text-slate-800">Payment Page</p>
+                <p className="text-xs text-slate-500">Complete payment details to finish registration.</p>
+              </div>
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-700 mb-1">
                   Payment Required ({university})
@@ -411,6 +415,13 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
                 />
                 {errors.paymentFromNumber && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.paymentFromNumber.message}</p>}
               </div>
+            </div>
+          )}
+
+          {!requiresPayment && (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+              <p className="text-base font-black text-slate-800">Final Step</p>
+              <p className="text-sm text-slate-600 mt-1">No payment is required for MIST. Review and submit your registration.</p>
             </div>
           )}
 

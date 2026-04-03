@@ -340,7 +340,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
                   Payment amount: <span className="font-bold">100tk</span>.
                 </p>
                 <p className="text-sm text-slate-600 mt-1">
-                  Send payment via bKash or Nagad to{" "}
+                  Send payment ( SEND Money) via bKash or Nagad to{" "}
                   <button
                     type="button"
                     onClick={copyPaymentNumber}

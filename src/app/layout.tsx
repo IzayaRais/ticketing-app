@@ -1,5 +1,4 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+﻿import type { Metadata } from "next";
 import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
 import InstituteGate from "@/components/InstituteGate";
@@ -59,4 +58,3 @@ export default function RootLayout({
     </html>
   );
 }
-

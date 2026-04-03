@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar";
 import RegistrationForm from "@/components/RegistrationForm";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Ticket, Calendar, MapPin, Users, ArrowRight,
+  Ticket, Calendar, Users, ArrowRight,
   Music, Star, ShieldCheck,
   Navigation, Compass, Map as MapIcon,
   ChevronDown,
@@ -93,7 +93,7 @@ export default function LandingPage() {
             >
               <div className="flex items-center gap-2 mb-6">
                 <span className="px-4 py-1.5 bg-maroon-700/10 text-maroon-700 text-xs font-black uppercase tracking-widest rounded-full border border-maroon-700/10">
-                  Farewell Event Â· 2026
+                  Farewell Event · 2026
                 </span>
                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
               </div>
@@ -379,7 +379,7 @@ export default function LandingPage() {
           <div className="border-t border-slate-800 py-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-slate-500 text-sm">
-                Â© 2026 অন্তরীপ ২১ Class &apos;26. All rights reserved.
+                © 2026 অন্তরীপ ২১ Class &apos;26. All rights reserved.
               </p>
               <p className="text-slate-600 text-sm">
                 Developed by <a href="https://raisul-islam-ratul.vercel.app" target="_blank" rel="noopener noreferrer" className="text-maroon-400 hover:text-maroon-300 font-bold transition-colors">Raisul Islam Ratul</a>

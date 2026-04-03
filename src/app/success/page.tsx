@@ -98,7 +98,7 @@ function SuccessContent() {
             <div className="flex items-center gap-3">
               <Ticket className="w-5 h-5 text-white/70" />
               <span className="text-white/70 text-sm font-bold uppercase tracking-widest">
-                অন্তরীপ ২১ Farewell Â· Concert Pass
+                অন্তরীপ ২১ Farewell · Concert Pass
               </span>
             </div>
             <div className="flex gap-2">

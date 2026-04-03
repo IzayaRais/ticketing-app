@@ -1,6 +1,7 @@
 import { GoogleSpreadsheet, GoogleSpreadsheetWorksheet } from "google-spreadsheet";
 import { JWT } from "google-auth-library";
 import { RegistrationData } from "./validations";
+import { PAYMENT_NUMBER } from "./institute";
 import fs from "fs";
 
 const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID;
@@ -49,20 +50,27 @@ async function getDoc() {
 }
 
 async function ensureHeaders(sheet: GoogleSpreadsheetWorksheet) {
+  const requiredHeaders = [
+    "timestamp", "ticketId", "fullName", "email",
+    "phone", "studentId", "university", "gender", "bloodGroup",
+    "paymentMethod", "transactionId", "paymentNumber",
+    "status",
+  ];
+
   try {
     await sheet.loadHeaderRow();
-    const headers = sheet.headerValues;
-    if (!headers.includes("gender")) {
-       await sheet.setHeaderRow([
-        "timestamp", "ticketId", "fullName", "email",
-        "phone", "studentId", "university", "gender", "bloodGroup", "status"
-      ]);
+    const headers = [...sheet.headerValues];
+    if (headers.length === 0) {
+      await sheet.setHeaderRow(requiredHeaders);
+      return;
+    }
+
+    const missingHeaders = requiredHeaders.filter((header) => !headers.includes(header));
+    if (missingHeaders.length > 0) {
+      await sheet.setHeaderRow([...headers, ...missingHeaders]);
     }
   } catch {
-    await sheet.setHeaderRow([
-      "timestamp", "ticketId", "fullName", "email",
-      "phone", "studentId", "university", "gender", "tshirtSize", "bloodGroup", "status"
-    ]);
+    await sheet.setHeaderRow(requiredHeaders);
   }
 }
 
@@ -82,6 +90,9 @@ export async function appendToSheet(data: RegistrationData & { ticketId: string 
       university: data.university,
       gender: data.gender,
       bloodGroup: data.bloodGroup,
+      paymentMethod: data.paymentMethod || "",
+      transactionId: data.transactionId || "",
+      paymentNumber: data.paymentMethod ? PAYMENT_NUMBER : "",
       status: "Verified",
     });
   } catch (error) {
@@ -111,6 +122,9 @@ export async function getTicketById(ticketId: string) {
       university: row.get("university"),
       gender: row.get("gender"),
       bloodGroup: row.get("bloodGroup"),
+      paymentMethod: row.get("paymentMethod") || "",
+      transactionId: row.get("transactionId") || "",
+      paymentNumber: row.get("paymentNumber") || "",
       status: row.get("status"),
       timestamp: row.get("timestamp"),
       checkedIn: row.get("checkedIn") || "",
@@ -125,6 +139,7 @@ export async function getTicketByEmail(email: string) {
   try {
     const doc = await getDoc();
     const sheet = doc.sheetsByIndex[0];
+    await ensureHeaders(sheet);
     const rows = await sheet.getRows();
 
     const row = rows.find((r) => r.get("email") === email);
@@ -139,6 +154,9 @@ export async function getTicketByEmail(email: string) {
       university: row.get("university"),
       gender: row.get("gender"),
       bloodGroup: row.get("bloodGroup"),
+      paymentMethod: row.get("paymentMethod") || "",
+      transactionId: row.get("transactionId") || "",
+      paymentNumber: row.get("paymentNumber") || "",
       status: row.get("status"),
       timestamp: row.get("timestamp"),
     };
@@ -151,6 +169,7 @@ export async function getAllTickets() {
   try {
     const doc = await getDoc();
     const sheet = doc.sheetsByIndex[0];
+    await ensureHeaders(sheet);
     const rows = await sheet.getRows();
 
     return rows.map((r) => ({
@@ -162,6 +181,9 @@ export async function getAllTickets() {
       university: r.get("university"),
       gender: r.get("gender"),
       bloodGroup: r.get("bloodGroup"),
+      paymentMethod: r.get("paymentMethod") || "",
+      transactionId: r.get("transactionId") || "",
+      paymentNumber: r.get("paymentNumber") || "",
       status: r.get("status"),
       timestamp: r.get("timestamp"),
       checkedIn: r.get("checkedIn") || "",
@@ -287,4 +309,3 @@ export async function markTicketCheckedIn(ticketId: string) {
     throw error;
   }
 }
-

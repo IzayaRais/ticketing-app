@@ -7,6 +7,9 @@ export interface AttendeeRow {
   university: string;
   gender: string;
   bloodGroup: string;
+  paymentMethod: string;
+  transactionId: string;
+  paymentNumber: string;
   status: string;
   timestamp: string;
   checkedIn: string;

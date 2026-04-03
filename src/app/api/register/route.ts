@@ -57,8 +57,12 @@ export async function POST(request: Request) {
     }
 
     const { data } = result;
+    const normalizedData = {
+      ...data,
+      transactionId: data.transactionId?.trim().toUpperCase() || "",
+    };
 
-    const existing = await getTicketByEmail(data.email);
+    const existing = await getTicketByEmail(normalizedData.email);
     if (existing) {
       return NextResponse.json(
         { message: "This email is already registered. Please use the Verify Ticket page to access your pass." },
@@ -68,13 +72,13 @@ export async function POST(request: Request) {
 
     const ticketId = `AT-${uuidv4().substring(0, 8).toUpperCase()}`;
 
-    await appendToSheet({ ...data, ticketId });
+    await appendToSheet({ ...normalizedData, ticketId });
 
-    const pdfBuffer = await generateTicketPdf(data, ticketId);
-    const emailHtml = generateTicketEmailHTML(data.fullName, ticketId);
+    const pdfBuffer = await generateTicketPdf(normalizedData, ticketId);
+    const emailHtml = generateTicketEmailHTML(normalizedData.fullName, ticketId);
     
     await sendEmail({
-      to: data.email,
+      to: normalizedData.email,
       subject: "Your Antorip Farewell Concert Entry Pass",
       html: emailHtml,
       attachments: [
@@ -88,7 +92,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       message: "Registration successful",
       ticketId,
-      email: data.email,
+      email: normalizedData.email,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";

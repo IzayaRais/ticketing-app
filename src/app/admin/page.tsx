@@ -24,6 +24,9 @@ interface Ticket {
   university: string;
   gender: string;
   bloodGroup: string;
+  paymentMethod: string;
+  transactionId: string;
+  paymentNumber: string;
   status: string;
   timestamp: string;
   checkedIn: string;
@@ -118,7 +121,9 @@ export default function AdminDashboard() {
         t.email.toLowerCase().includes(search.toLowerCase()) ||
         t.university.toLowerCase().includes(search.toLowerCase()) ||
         t.ticketId.toLowerCase().includes(search.toLowerCase()) ||
-        t.studentId.toLowerCase().includes(search.toLowerCase());
+        t.studentId.toLowerCase().includes(search.toLowerCase()) ||
+        (t.paymentMethod || "").toLowerCase().includes(search.toLowerCase()) ||
+        (t.transactionId || "").toLowerCase().includes(search.toLowerCase());
       const matchesGender = genderFilter === "all" || t.gender === genderFilter;
       const matchesUniversity = universityFilter === "all" || t.university === universityFilter;
       const matchesBloodGroup = bloodGroupFilter === "all" || t.bloodGroup === bloodGroupFilter;
@@ -164,12 +169,12 @@ export default function AdminDashboard() {
     });
 
   const downloadCSV = () => {
-    const headers = ["Ticket ID", "Full Name", "Email", "Phone", "Student ID", "University", "Gender", "Blood Group", "Status", "Timestamp"];
+    const headers = ["Ticket ID", "Full Name", "Email", "Phone", "Student ID", "University", "Gender", "Blood Group", "Payment Method", "Transaction ID", "Payment Number", "Status", "Timestamp"];
     const csvContent = [
       headers.join(","),
       ...filteredTickets.map(t => [
         t.ticketId, t.fullName, t.email, t.phone, t.studentId, 
-        t.university, t.gender, t.bloodGroup, t.status, t.timestamp
+        t.university, t.gender, t.bloodGroup, t.paymentMethod || "", t.transactionId || "", t.paymentNumber || "", t.status, t.timestamp
       ].map(v => `"${v}"`).join(","))
     ].join("\n");
 
@@ -601,6 +606,16 @@ export default function AdminDashboard() {
                       Blood
                     </span>
                   </th>
+                  <th className="px-4 py-3 text-left hidden xl:table-cell">
+                    <span className="flex items-center gap-1 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                      Payment
+                    </span>
+                  </th>
+                  <th className="px-4 py-3 text-left hidden xl:table-cell">
+                    <span className="flex items-center gap-1 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                      Txn ID
+                    </span>
+                  </th>
                   <th className="px-4 py-3 text-left">
                     <button 
                       onClick={() => handleSort("timestamp")}
@@ -620,7 +635,7 @@ export default function AdminDashboard() {
               <tbody className="divide-y divide-slate-100">
                 {filteredTickets.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-16 text-center">
+                    <td colSpan={9} className="px-6 py-16 text-center">
                       <div className="flex flex-col items-center gap-2">
                         <Users className="w-12 h-12 text-slate-200" />
                         <p className="text-slate-400 font-medium">No registrations found</p>
@@ -662,6 +677,22 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-4 py-3 hidden lg:table-cell">
                         <span className="text-sm font-bold text-red-600">{ticket.bloodGroup}</span>
+                      </td>
+                      <td className="px-4 py-3 hidden xl:table-cell">
+                        {ticket.paymentMethod ? (
+                          <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold border border-emerald-200">
+                            {ticket.paymentMethod}
+                          </span>
+                        ) : (
+                          <span className="text-xs font-semibold text-slate-400">N/A</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 hidden xl:table-cell">
+                        {ticket.transactionId ? (
+                          <span className="font-mono text-xs font-bold text-slate-700">{ticket.transactionId}</span>
+                        ) : (
+                          <span className="text-xs font-semibold text-slate-400">N/A</span>
+                        )}
                       </td>
                   <td className="px-4 py-3">
                     <p className="text-xs text-slate-400">

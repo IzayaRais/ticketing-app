@@ -1,10 +1,16 @@
 "use client";
 
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registrationSchema, RegistrationData } from "@/lib/validations";
 import { institutes } from "@/lib/validations";
+import {
+  paymentMethodOptions,
+  PAYMENT_NUMBER,
+  SELECTED_INSTITUTE_KEY,
+  type Institute,
+} from "@/lib/institute";
 import { useRouter } from "next/navigation";
 import {
   Loader2, AlertCircle, CheckCircle2,
@@ -61,6 +67,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [step, setStep] = useState(0);
+  const [selectedInstitute, setSelectedInstitute] = useState<Institute | null>(null);
   const router = useRouter();
 
   const {
@@ -68,21 +75,51 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
     handleSubmit,
     setValue,
     getValues,
+    watch,
     formState: { errors },
   } = useForm<RegistrationData>({
     resolver: zodResolver(registrationSchema),
     defaultValues: { terms: false },
   });
 
+  const university = watch("university");
+  const requiresPayment = university === "BUP" || university === "AFMC";
+
+  useEffect(() => {
+    const syncInstitute = () => {
+      const stored = sessionStorage.getItem(SELECTED_INSTITUTE_KEY) as Institute | null;
+      if (stored && institutes.includes(stored)) {
+        setSelectedInstitute(stored);
+        setValue("university", stored, { shouldValidate: true });
+      }
+    };
+
+    syncInstitute();
+    window.addEventListener("selectedInstituteChanged", syncInstitute);
+    return () => window.removeEventListener("selectedInstituteChanged", syncInstitute);
+  }, [setValue]);
+
+  useEffect(() => {
+    if (!requiresPayment) {
+      setValue("paymentMethod", undefined, { shouldValidate: true });
+      setValue("transactionId", "", { shouldValidate: true });
+    }
+  }, [requiresPayment, setValue]);
+
   const onSubmit = useCallback(async (data: RegistrationData) => {
     setIsSubmitting(true);
     setError(null);
 
     try {
+      const payload: RegistrationData = {
+        ...data,
+        university: selectedInstitute || data.university,
+      };
+
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       const result = await res.json();
@@ -102,7 +139,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
       setError(message);
       setIsSubmitting(false);
     }
-  }, [onSuccess, router]);
+  }, [onSuccess, router, selectedInstitute]);
 
   if (success) {
     return (
@@ -194,9 +231,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
       {step === 1 && (
         <div className="space-y-4">
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1.5">
-              Student ID
-            </label>
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1.5">Student ID</label>
             <input
               {...register("studentId")}
               className="w-full px-4 py-3.5 rounded-xl border border-slate-200/80 bg-white text-sm font-medium text-slate-800 placeholder:text-slate-300 outline-none transition-all duration-200 focus:border-maroon-700 focus:ring-4 focus:ring-maroon-700/8"
@@ -206,14 +241,25 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
             {errors.studentId && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.studentId.message}</p>}
           </div>
 
-          <SelectField
-            label="University"
-            value={getValues("university") || ""}
-            onChange={(val) => setValue("university", val as "MIST" | "BUP" | "AFMC", { shouldValidate: true })}
-            options={institutes}
-            placeholder="Select your university"
-            error={errors.university?.message}
-          />
+          {selectedInstitute ? (
+            <div>
+              <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1.5">
+                Institute
+              </label>
+              <div className="w-full px-4 py-3.5 rounded-xl border border-slate-200/80 bg-slate-50 text-sm font-bold text-slate-800">
+                {selectedInstitute}
+              </div>
+            </div>
+          ) : (
+            <SelectField
+              label="University"
+              value={getValues("university") || ""}
+              onChange={(val) => setValue("university", val as "MIST" | "BUP" | "AFMC", { shouldValidate: true })}
+              options={institutes}
+              placeholder="Select your university"
+              error={errors.university?.message}
+            />
+          )}
 
           <SelectField
             label="Gender"
@@ -254,6 +300,40 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
             placeholder="Select blood group"
             error={errors.bloodGroup?.message}
           />
+
+          {requiresPayment && (
+            <div className="space-y-4 rounded-2xl border border-amber-200 bg-amber-50/60 p-4">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-700 mb-1">
+                  Payment Required ({university})
+                </p>
+                <p className="text-sm text-slate-600">
+                  Send payment via bKash or Nagad to <span className="font-bold">{PAYMENT_NUMBER}</span>, then enter your transaction ID.
+                </p>
+              </div>
+
+              <SelectField
+                label="Payment Method"
+                value={getValues("paymentMethod") || ""}
+                onChange={(val) => setValue("paymentMethod", val as "BKASH" | "NAGAD", { shouldValidate: true })}
+                options={paymentMethodOptions}
+                placeholder="Select payment method"
+                error={errors.paymentMethod?.message}
+              />
+
+              <div>
+                <label className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1.5">
+                  Transaction ID
+                </label>
+                <input
+                  {...register("transactionId")}
+                  className="w-full px-4 py-3.5 rounded-xl border border-slate-200/80 bg-white text-sm font-medium text-slate-800 placeholder:text-slate-300 outline-none transition-all duration-200 focus:border-maroon-700 focus:ring-4 focus:ring-maroon-700/8"
+                  placeholder="Enter your bKash/Nagad transaction ID"
+                />
+                {errors.transactionId && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.transactionId.message}</p>}
+              </div>
+            </div>
+          )}
 
           <div className="pt-1">
             <label className="flex items-start gap-3 cursor-pointer group">

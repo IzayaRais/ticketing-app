@@ -48,9 +48,10 @@ export default function ScanPage() {
   const [scanHistory, setScanHistory] = useState<ScanHistoryEntry[]>([]);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const lastScanRef = useRef("");
+  const processingRef = useRef(false);
 
   const processTicket = useCallback(async (ticketId: string) => {
-    if (processing) return;
+    if (processingRef.current) return;
 
     const cleanId = ticketId.trim().toUpperCase();
     const match = cleanId.match(/AT-[A-Z0-9]{8}/);
@@ -61,6 +62,7 @@ export default function ScanPage() {
       return;
     }
 
+    processingRef.current = true;
     setProcessing(true);
     lastScanRef.current = finalId;
     setTimeout(() => { lastScanRef.current = ""; }, 5000);
@@ -116,17 +118,18 @@ export default function ScanPage() {
     } catch {
       setResult({ type: "error", ticketId: finalId, message: "Network error. Check connection." });
       setScanHistory(prev => [{ ticketId: finalId, fullName: "Unknown", type: "error" as const, timestamp: new Date().toLocaleTimeString() }, ...prev].slice(0, 20));
+    } finally {
+      processingRef.current = false;
+      setProcessing(false);
     }
-
-    setProcessing(false);
-  }, [processing]);
+  }, []);
 
   const handleScan = useCallback(async (decodedText: string) => {
-    if (processing) return;
+    if (processingRef.current) return;
     if (decodedText === lastScanRef.current) return;
 
     await processTicket(decodedText);
-  }, [processing, processTicket]);
+  }, [processTicket]);
 
   const handleManualSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

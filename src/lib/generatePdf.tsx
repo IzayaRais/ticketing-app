@@ -316,6 +316,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  sponsorLine: {
+    width: "100%",
+    textAlign: "center",
+    marginBottom: 8,
+    fontSize: 6.2,
+    color: "#475569",
+    lineHeight: 1.25,
+  },
+  sponsorBrand: {
+    color: "#1E293B",
+    fontWeight: "bold",
+  },
+  sponsorEvent: {
+    color: "#800000",
+    fontSize: 8.2,
+    fontWeight: "bold",
+  },
+  sponsorAccent: {
+    color: "#334155",
+    fontWeight: "bold",
+  },
   qrImage: {
     width: 70,
     height: 70,
@@ -344,8 +365,8 @@ const TicketDocument = ({ data, ticketId, qrCodeUrl }: { data: RegistrationData;
           <View style={styles.topSection}>
             <View style={styles.header}>
               <View style={styles.headerLeft}>
-                <Text style={styles.eventTag}>অন্তরীপ ২১ 2026 Presents</Text>
-                <Text style={styles.title}>The Farewell</Text>
+                <Text style={styles.eventTag}>The Farewel Ceremony</Text>
+                <Text style={styles.title}>অন্তরীপ-২১</Text>
                 <Text style={styles.subtitle}>A Memorable Musical Experience</Text>
               </View>
               <View style={styles.headerRight}>
@@ -415,6 +436,13 @@ const TicketDocument = ({ data, ticketId, qrCodeUrl }: { data: RegistrationData;
           </View>
 
           <View style={styles.qrSection}>
+            <Text style={styles.sponsorLine}>
+              <Text style={styles.sponsorBrand}>Trust Bank PLC presents </Text>
+              <Text style={styles.sponsorEvent}>{"\u0985\u09A8\u09CD\u09A4\u09B0\u09C0\u09AA-\u09E8\u09E7"}</Text>
+              <Text style={styles.sponsorAccent}> Co-powered by Taha Group.</Text>
+              <Text>{" Organized By: Directorate of Student Welfare,MIST. Food Partner: "}</Text>
+              <Text style={styles.sponsorAccent}>{"\u0985\u09A8\u09CD\u09A8"}</Text>
+            </Text>
             {/* eslint-disable-next-line jsx-a11y/alt-text */}
             <Image src={qrCodeUrl} style={styles.qrImage} />
           </View>

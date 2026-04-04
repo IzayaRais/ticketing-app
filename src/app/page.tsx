@@ -212,13 +212,13 @@ export default function LandingPage() {
               <div className="relative h-32 w-full flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-2">
                 <Image 
                   src="/logo/TBPLC_Logo_ENG with tagline.png" 
-                  alt="Trust Bank Ltd" 
+                  alt="Trust Bank PLC" 
                   width={320} 
                   height={100} 
                   className="object-contain"
                 />
               </div>
-              <h4 className="mt-8 text-xl font-black text-maroon-950">Trust Bank Ltd</h4>
+              <h4 className="mt-8 text-xl font-black text-maroon-950">Trust Bank PLC</h4>
             </div>
 
             {/* Co-powered By */}

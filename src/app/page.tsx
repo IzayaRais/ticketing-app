@@ -1,9 +1,11 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import Image from "next/image";
 import RegistrationForm from "@/components/RegistrationForm";
+
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Ticket, Calendar, Users, ArrowRight,
@@ -196,15 +198,67 @@ export default function LandingPage() {
       </section>
 
       {/* Sponsors Row */}
-      <section className="py-12 bg-white border-y border-slate-100 overflow-hidden">
+      <section className="py-20 bg-white border-y border-slate-100 overflow-hidden">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center gap-12 md:gap-20">
-            <div className="flex-shrink-0">
-              <p className="text-[10px] font-black text-maroon-700 uppercase tracking-[0.3em] mb-4">Strategic Partners</p>
-              <h4 className="text-2xl font-black text-slate-900 tracking-tight">Project Sponsors</h4>
+          <div className="text-center mb-16">
+            <p className="text-[11px] font-black text-maroon-700 uppercase tracking-[0.4em] mb-4">Strategic Partnerships</p>
+            <h2 className="text-4xl font-black text-maroon-950 tracking-tight uppercase">Our Valuable Sponsors</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-20">
+            {/* Title Sponsor */}
+            <div className="flex flex-col items-center group">
+              <span className="px-4 py-1 bg-maroon-700 text-white text-[10px] font-black uppercase tracking-widest rounded-full mb-8">Title Sponsor</span>
+              <div className="relative h-32 w-full flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-2">
+                <Image 
+                  src="/logo/TBPLC_Logo_ENG with tagline.png" 
+                  alt="Trust Bank Ltd" 
+                  width={320} 
+                  height={100} 
+                  className="object-contain"
+                />
+              </div>
+              <h4 className="mt-8 text-xl font-black text-maroon-950">Trust Bank Ltd</h4>
             </div>
-            <div className="flex-1 flex items-center justify-center md:justify-start">
-              <p className="text-2xl font-black text-slate-400 uppercase tracking-[0.2em]">TBA</p>
+
+            {/* Co-powered By */}
+            <div className="flex flex-col items-center group">
+              <span className="px-4 py-1 bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-widest rounded-full mb-8">Co-powered by</span>
+              <div className="relative h-32 w-full flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-2">
+                <Image 
+                  src="/logo/taha.png" 
+                  alt="Taha Group" 
+                  width={240} 
+                  height={80} 
+                  className="object-contain"
+                />
+              </div>
+              <h4 className="mt-8 text-xl font-black text-maroon-950">Taha Group</h4>
+            </div>
+
+            {/* Food Partner */}
+            <div className="flex flex-col items-center group">
+              <span className="px-4 py-1 bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-widest rounded-full mb-8">Food Partner</span>
+              <div className="relative h-32 w-full flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-2">
+                <Image 
+                  src="/logo/onno.png" 
+                  alt="অন্ন" 
+                  width={180} 
+                  height={80} 
+                  className="object-contain"
+                />
+              </div>
+              <h4 className="mt-8 text-xl font-black text-maroon-950">অন্ন</h4>
+            </div>
+          </div>
+
+          <div className="pt-16 border-t border-slate-100 flex flex-col items-center text-center">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 text-center">Event Host</p>
+            <div className="inline-flex items-center gap-4 py-4 px-8 bg-maroon-50/50 rounded-2xl border border-maroon-100/50">
+              <div className="w-1.5 h-1.5 rounded-full bg-maroon-700 animate-pulse" />
+              <h3 className="text-2xl font-black text-maroon-950 tracking-tight">
+                Organized By: <span className="text-maroon-700">Directorate of Student Welfare, MIST</span>
+              </h3>
             </div>
           </div>
         </div>
@@ -391,4 +445,3 @@ export default function LandingPage() {
     </main>
   );
 }
-

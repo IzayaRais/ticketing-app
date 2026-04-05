@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState, Suspense } from "react";
 import { useSession, signIn } from "next-auth/react";
@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Shield, Clock, Ticket, Info, Loader2, Calendar, MapPin, Sparkles, CheckCircle, ArrowRight, User } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import Image from "next/image";
 import RegistrationForm from "@/components/RegistrationForm";
 import TicketCard from "@/components/TicketCard";
 
@@ -231,7 +232,13 @@ function DashboardContent() {
                 {session?.user && (
                   <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-2xl">
                     {session.user.image ? (
-                      <img src={session.user.image} alt="User" className="w-10 h-10 rounded-full border-2 border-maroon-500" />
+                      <Image 
+                        src={session.user.image} 
+                        alt="User" 
+                        width={40} 
+                        height={40} 
+                        className="rounded-full border-2 border-maroon-500" 
+                      />
                     ) : (
                       <div className="w-10 h-10 bg-gradient-to-br from-maroon-400 to-orange-500 rounded-full flex items-center justify-center">
                         <User className="w-5 h-5 text-white" />

@@ -12,7 +12,7 @@ import {
   Music, Star, ShieldCheck,
   Navigation, Compass, Map as MapIcon,
   ChevronDown,
-  Mic2, Radio, Disc, Mail
+  Mic2, Mail
 } from "lucide-react";
 
 function CountdownTimer() {

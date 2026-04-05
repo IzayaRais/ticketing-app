@@ -88,7 +88,7 @@ export default function LandingPage() {
       name: "MIST Band", 
       role: "Opening Act", 
       genre: "Campus Rock", 
-      photo: "https://mist.ac.bd/uploads/1758816508.jpg",
+      photo: "https://scontent.fdac207-1.fna.fbcdn.net/v/t39.30808-6/492691796_1270941918368342_9013690205630182707_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=7b2446&_nc_eui2=AeF4nMXqB-NndDu_-s69vhFGp945jSdxtf-n3jmNJ3G1_3YDBIuzyW75u7yiPrZK03M1XX4dAGXExt7Qe3w-3g_t&_nc_ohc=VLvTyUC29P8Q7kNvwGbYWNd&_nc_oc=AdoaCBk03rRacMNVVGEIKCn3M3IcZH50qAReQqxErwB6hfSsx0XucrOjIvdo9WhzJE0&_nc_zt=23&_nc_ht=scontent.fdac207-1.fna&_nc_gid=bGvy0YslOxImU5s2H8IX-w&_nc_ss=7a3a8&oh=00_Af0xcUHR7q9gXNTfYXP33NpSip1LkoNS2c7rpJEBzRdsBA&oe=69D83563",
       logo: "https://upload.wikimedia.org/wikipedia/en/a/a7/Military_Institute_of_Science_and_Technology_Monogram.svg"
     },
   ];

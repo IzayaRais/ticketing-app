@@ -80,7 +80,7 @@ async function getDoc() {
   return doc;
 }
 
-export async function getDashboardStats() {
+export async function getDashboardStats(): Promise<DashboardStats> {
   try {
     const doc = await getDoc();
     const mainSheet = doc.sheetsByIndex[0];
@@ -194,7 +194,6 @@ export async function getDashboardStats() {
       scanHistory,
       currentVelocity,
       securityAlerts,
-      attendanceProjection,
       serverStatus: "operational",
       lastUpdated: new Date().toISOString(),
     };
@@ -208,10 +207,13 @@ export async function getDashboardStats() {
       duplicateScans: 0,
       universityCounts: {},
       scannerCounts: {},
-      securityAlerts: [],
+      bloodGroupCounts: {},
+      recentScans: [],
+      scanHistory: [],
       currentVelocity: 0,
+      securityAlerts: [],
       serverStatus: "error",
       lastUpdated: new Date().toISOString(),
-    };
+    } as DashboardStats;
   }
 }

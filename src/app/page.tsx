@@ -70,9 +70,27 @@ export default function LandingPage() {
   ];
 
   const artists = [
-    { name: "Headliner Band", genre: "To Be Announced", icon: <Mic2 className="w-6 h-6 text-maroon-700" /> },
-    { name: "Special Guest", genre: "Mystery Performance", icon: <Radio className="w-6 h-6 text-maroon-700" /> },
-    { name: "Opening Act", genre: "Unveiling Soon", icon: <Disc className="w-6 h-6 text-maroon-700" /> },
+    { 
+      name: "Nemesis", 
+      role: "Headliner", 
+      genre: "Modern Rock", 
+      photo: "https://www.tbsnews.net/sites/default/files/styles/infograph/public/images/2025/05/22/nemesis_band_photo.png",
+      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSB_XZwqEBeqHVhM3Dm24q6gdX0iQw_QcFgA&s"
+    },
+    { 
+      name: "Level5", 
+      role: "Special Guest", 
+      genre: "Indie Pop", 
+      photo: "https://i.scdn.co/image/ab6761610000e5eb8bb57badc52a082653137635",
+      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSanEHbrB1VhH0_pwNE-RPRZU-WNcL10R-mHg&s"
+    },
+    { 
+      name: "MIST Band", 
+      role: "Opening Act", 
+      genre: "Campus Rock", 
+      photo: "https://mist.ac.bd/uploads/1758816508.jpg",
+      logo: "https://upload.wikimedia.org/wikipedia/en/a/a7/Military_Institute_of_Science_and_Technology_Monogram.svg"
+    },
   ];
 
   return (
@@ -184,13 +202,36 @@ export default function LandingPage() {
               <motion.div
                 key={idx}
                 whileHover={{ scale: 1.05 }}
-                className="group relative p-12 bg-[#FAF9F6] rounded-[48px] border border-slate-100 transition-all hover:shadow-2xl hover:shadow-maroon-700/5"
+                className="group relative h-[450px] rounded-[48px] overflow-hidden border border-slate-100 transition-all hover:shadow-2xl hover:shadow-maroon-700/5"
               >
-                <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-sm border border-slate-50 group-hover:rotate-12 transition-transform">
-                  {artist.icon}
+                {/* Band Photo Background */}
+                <div className="absolute inset-0">
+                  <Image 
+                    src={artist.photo}
+                    alt={artist.name}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-maroon-950 via-maroon-950/40 to-transparent opacity-80" />
                 </div>
-                <h4 className="text-3xl font-black text-maroon-950 mb-3 uppercase tracking-tighter">{artist.name}</h4>
-                <p className="text-[11px] font-black text-maroon-600 uppercase tracking-[0.4em]">{artist.genre}</p>
+
+                {/* Content */}
+                <div className="relative h-full p-10 flex flex-col justify-end text-center">
+                  <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-6 border border-white/30 group-hover:rotate-12 transition-transform">
+                     <Image 
+                        src={artist.logo}
+                        alt={`${artist.name} Logo`}
+                        width={40}
+                        height={40}
+                        className="object-contain"
+                     />
+                  </div>
+                  <h4 className="text-3xl font-black text-white mb-2 uppercase tracking-tighter">{artist.name}</h4>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-[10px] font-black text-maroon-400 uppercase tracking-[0.4em]">{artist.role}</p>
+                    <p className="text-xs font-bold text-white/60 tracking-wider uppercase italic">{artist.genre}</p>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>

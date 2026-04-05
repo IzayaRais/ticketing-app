@@ -25,7 +25,7 @@ export const registrationSchema = z.object({
     message: "You must agree to the terms and conditions",
   }),
 }).superRefine((data, ctx) => {
-  const needsPayment = data.university === "BUP" || data.university === "AFMC";
+  const needsPayment = false;
   const transactionId = (data.transactionId || "").trim();
   const paymentFromNumber = (data.paymentFromNumber || "").trim();
   const validBanglaPhone = /^(?:880|0)1[3-9]\d{8}$/;
@@ -43,7 +43,7 @@ export const registrationSchema = z.object({
       ctx.addIssue({
         code: "custom",
         path: ["transactionId"],
-        message: "Transaction ID is required for BUP/AFMC students",
+        message: "Transaction ID is required for all students",
       });
     } else if (!/^[A-Za-z0-9-]{6,40}$/.test(transactionId)) {
       ctx.addIssue({

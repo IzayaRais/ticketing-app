@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { memo, useState, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -91,7 +91,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
   const gender = watch("gender");
   const bloodGroup = watch("bloodGroup");
   const paymentMethod = watch("paymentMethod");
-  const requiresPayment = university === "BUP" || university === "AFMC";
+  const requiresPayment = false;
 
   useEffect(() => {
     const syncInstitute = () => {
@@ -450,7 +450,7 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
           {!requiresPayment && (
             <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
               <p className="text-base font-black text-slate-800">Final Step</p>
-              <p className="text-sm text-slate-600 mt-1">No payment is required for MIST. Review and submit your registration.</p>
+              <p className="text-sm text-slate-600 mt-1">Review and submit your registration to receive your ticket.</p>
             </div>
           )}
 

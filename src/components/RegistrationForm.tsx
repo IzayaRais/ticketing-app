@@ -258,7 +258,8 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
             <input
               {...register("studentId")}
               className="w-full px-4 py-3.5 rounded-xl border border-slate-200/80 bg-white text-sm font-medium text-slate-800 placeholder:text-slate-300 outline-none transition-all duration-200 focus:border-maroon-700 focus:ring-4 focus:ring-maroon-700/8"
-              placeholder="Your Student ID"
+              placeholder="3 to 11 digits"
+              inputMode="numeric"
               autoFocus
             />
             {errors.studentId && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.studentId.message}</p>}

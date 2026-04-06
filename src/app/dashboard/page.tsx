@@ -34,6 +34,11 @@ function DashboardContent() {
   const searchParams = useSearchParams();
   const [existingTicket, setExistingTicket] = useState<{ ticketId: string; fullName: string; email: string; phone: string; studentId?: string; university: string; gender?: string; bloodGroup?: string; status: string; timestamp?: string } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedInst, setSelectedInst] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSelectedInst(sessionStorage.getItem("selectedInstitute"));
+  }, []);
 
   useEffect(() => {
     if (status === "authenticated" && session?.user?.email) {
@@ -337,7 +342,17 @@ function DashboardContent() {
                       </div>
                     </div>
                     <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent mb-6"></div>
-                    <RegistrationForm onSuccess={handleRegistrationSuccess} />
+                    {(selectedInst === "BUP" || selectedInst === "AFMC") ? (
+                      <div className="p-8 bg-maroon-50 rounded-[32px] border-2 border-dashed border-maroon-200 text-center">
+                        <Shield className="w-12 h-12 text-maroon-600 mx-auto mb-4 opacity-20" />
+                        <h3 className="text-2xl font-black text-maroon-950 mb-2">Registration Closed</h3>
+                        <p className="text-slate-500 font-medium max-w-sm mx-auto">
+                           The registration quota for <span className="text-maroon-700 font-bold">{selectedInst}</span> is now full. Try again next time.
+                        </p>
+                      </div>
+                    ) : (
+                      <RegistrationForm onSuccess={handleRegistrationSuccess} />
+                    )}
                   </div>
                 )}
               </motion.div>

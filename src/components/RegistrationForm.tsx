@@ -276,20 +276,22 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
               {errors.university && <p className="text-xs font-medium text-red-500 mt-1.5">{errors.university.message}</p>}
             </div>
           ) : (
-            <SelectField
-              label="University"
-              value={university || ""}
-              onChange={(val) =>
-                setValue("university", val as "MIST" | "BUP" | "AFMC", {
-                  shouldDirty: true,
-                  shouldTouch: true,
-                  shouldValidate: true,
-                })
-              }
-              options={institutes}
-              placeholder="Select your university"
-              error={errors.university?.message}
-            />
+            <div className="space-y-4">
+              <SelectField
+                label="University"
+                value={university || ""}
+                onChange={(val) =>
+                  setValue("university", val as "MIST" | "BUP" | "AFMC", {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                    shouldValidate: true,
+                  })
+                }
+                options={institutes}
+                placeholder="Select your university"
+                error={errors.university?.message}
+              />
+            </div>
           )}
 
           <SelectField

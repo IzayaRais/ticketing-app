@@ -71,11 +71,22 @@ export default function StatsClient({ initialStats }: { initialStats: DashboardS
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passInput, setPassInput] = useState("");
   const [passError, setPassError] = useState(false);
+  const [isMounting, setIsMounting] = useState(true);
+
+  // Persistence Check
+  useEffect(() => {
+    const savedAuth = localStorage.getItem("see_auth_v2");
+    if (savedAuth === "true") {
+      setIsAuthenticated(true);
+    }
+    setIsMounting(false);
+  }, []);
 
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
     if (passInput === "EECE20") {
       setIsAuthenticated(true);
+      localStorage.setItem("see_auth_v2", "true");
       playBeep(880, 0.1);
     } else {
       setPassError(true);
@@ -218,12 +229,14 @@ export default function StatsClient({ initialStats }: { initialStats: DashboardS
 
 
 
+  if (isMounting) return <div className="h-screen bg-black" />;
+
   if (!isAuthenticated) {
     return (
-      <div className="h-screen w-screen bg-[#020617] flex items-center justify-center p-6 font-mono overflow-hidden">
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center p-6 font-mono overflow-hidden">
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
           className="w-full max-w-md p-8 rounded-[2rem] bg-slate-900/50 border border-slate-800 backdrop-blur-xl shadow-2xl relative overflow-hidden"
         >
           {/* Security Decals */}
@@ -246,10 +259,10 @@ export default function StatsClient({ initialStats }: { initialStats: DashboardS
               <input 
                 autoFocus
                 type="password" 
-                placeholder="ENTER SECURITY CODE..."
+                placeholder="TOKEN"
                 value={passInput}
                 onChange={(e) => setPassInput(e.target.value.toUpperCase())}
-                className={`w-full bg-black/40 border ${passError ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-slate-800 focus:border-maroon-500'} rounded-2xl py-4 px-6 text-center text-sm font-black tracking-[1em] outline-none transition-all placeholder:tracking-widest placeholder:text-slate-700 text-white`}
+                className={`w-full bg-black/40 border ${passError ? 'border-rose-500 ring-4 ring-rose-500/10' : 'border-slate-800 focus:border-maroon-500'} rounded-2xl py-4 px-6 text-center text-sm font-black tracking-[0.5em] outline-none transition-all placeholder:tracking-widest placeholder:text-slate-700 text-white`}
               />
               {passError && (
                 <motion.p 
@@ -282,27 +295,27 @@ export default function StatsClient({ initialStats }: { initialStats: DashboardS
   }
 
   return (
-    <div className="h-screen w-screen bg-[#020617] text-slate-100 font-sans selection:bg-maroon-500 selection:text-white overflow-hidden flex flex-col">
+    <div className="min-h-screen lg:h-screen w-screen bg-[#020617] text-slate-100 font-sans selection:bg-maroon-500 selection:text-white overflow-y-auto lg:overflow-hidden flex flex-col">
       {/* Background Decor */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] bg-maroon-900/5 rounded-full blur-[120px]"></div>
         <div className="absolute top-[30%] -right-[10%] w-[40%] h-[40%] bg-orange-900/5 rounded-full blur-[100px]"></div>
       </div>
 
-      <div className="relative flex-1 flex flex-col max-w-[1600px] mx-auto w-full px-6 py-6 overflow-hidden">
+      <div className="relative flex-1 flex flex-col max-w-[1600px] mx-auto w-full px-4 md:px-6 py-4 md:py-6 overflow-y-auto lg:overflow-hidden scrollbar-hide">
         {/* Compact Header & Search */}
-        <header className="flex items-center justify-between gap-6 mb-6 pb-4 border-b border-slate-800/30 flex-shrink-0">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6 pb-4 border-b border-slate-800/30 flex-shrink-0">
           <motion.div 
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             className="flex items-center gap-4"
           >
-            <div className="w-10 h-10 bg-maroon-700 rounded-xl flex items-center justify-center shadow-lg shadow-maroon-900/20">
+            <div className="w-10 h-10 bg-maroon-700 rounded-xl flex items-center justify-center shadow-lg shadow-maroon-900/20 flex-shrink-0">
                <Zap className="w-5 h-5 text-white" />
             </div>
             <div>
               <h1 className="text-xl font-black tracking-tight text-white leading-tight">
-                Event<span className="text-maroon-500">Insight</span><span className="text-slate-600 text-xs ml-1 font-bold tracking-tighter">PROTO</span>
+                Event<span className="text-maroon-500">Insight</span><span className="text-slate-600 text-[10px] ml-1 font-bold tracking-tighter">PROTO</span>
               </h1>
               <div className="flex items-center gap-2">
                 <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">HQ Terminal</span>
@@ -311,7 +324,10 @@ export default function StatsClient({ initialStats }: { initialStats: DashboardS
             </div>
           </motion.div>
 
-          <div className="flex-1 max-w-md relative group px-10">
+          <div 
+            className="flex-1 max-w-md relative group px-10 cursor-pointer"
+            onClick={() => document.getElementById("command-search")?.focus()}
+          >
             <div className="flex items-center justify-between mb-1.5 px-1">
                <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Global Capacity</span>
                <div className="flex items-center gap-1.5">
@@ -387,10 +403,8 @@ export default function StatsClient({ initialStats }: { initialStats: DashboardS
               <RefreshCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
             </button>
           </div>
-        </header>
-
-        {/* Compact KPI Row */}
-        <div className="grid grid-cols-5 gap-3 mb-6 flex-shrink-0">
+        </header>        {/* Compact KPI Row */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6 flex-shrink-0">
             {[
               { label: "Guest List", value: stats.totalReg, icon: Users, color: "slate" },
               { label: "On-Site", value: stats.scansDone, icon: QrCode, color: "emerald", extra: "confirmed" },
@@ -402,7 +416,7 @@ export default function StatsClient({ initialStats }: { initialStats: DashboardS
                key={idx}
                initial={{ opacity: 0, scale: 0.95 }}
                animate={{ opacity: 1, scale: 1 }}
-               className="p-4 rounded-2xl bg-slate-900/30 border border-slate-800 flex items-center justify-between group hover:border-slate-700/50 transition-all"
+               className={`p-4 rounded-2xl bg-slate-900/30 border border-slate-800 flex items-center justify-between group hover:border-slate-700/50 transition-all ${idx === 4 ? 'col-span-2 md:col-span-1' : ''}`}
              >
                <div>
                   <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">{kpi.label}</p>
@@ -415,11 +429,11 @@ export default function StatsClient({ initialStats }: { initialStats: DashboardS
                   <kpi.icon className={`w-3.5 h-3.5 text-${kpi.color}-500/80`} />
                </div>
              </motion.div>
-           ))}
+            ))}
         </div>
 
         {/* 3-Column Grid Layout - SCALED TO FILL HEIGHT */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 overflow-hidden min-h-0">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 overflow-visible lg:overflow-hidden min-h-0">
           
           {/* Left Column: Logistics */}
           <div className="lg:col-span-3 space-y-4 flex flex-col h-full">
@@ -487,7 +501,7 @@ export default function StatsClient({ initialStats }: { initialStats: DashboardS
                 </h3>
                 <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">REAL-TIME FLOW</span>
               </div>
-              <div className="flex-1 flex items-end gap-1 px-1 min-h-0">
+              <div className="flex-1 flex items-end gap-1 px-1 min-h-[100px] lg:min-h-0">
                 {scanHistory.map((item: HistoryPoint, idx: number) => (
                   <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 group">
                     <motion.div 
@@ -608,13 +622,13 @@ export default function StatsClient({ initialStats }: { initialStats: DashboardS
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
-              className="fixed bottom-10 right-10 w-96 border border-slate-700 bg-black/90 backdrop-blur-2xl rounded-3xl shadow-2xl shadow-black z-50 overflow-hidden"
+              className="fixed bottom-4 md:bottom-10 left-4 right-4 md:left-auto md:right-10 w-auto md:w-96 border border-slate-700 bg-black/90 backdrop-blur-2xl rounded-3xl shadow-2xl shadow-black z-50 overflow-hidden"
             >
               <div className="p-3 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between">
                 <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Debug.Log Console</span>
                 <button onClick={() => setShowTerminal(false)} className="text-[8px] font-black text-rose-500 hover:text-rose-400 uppercase">Close</button>
               </div>
-              <div className="p-4 h-56 overflow-y-auto font-mono text-[9px] leading-tight custom-scrollbar">
+              <div className="p-4 h-48 md:h-56 overflow-y-auto font-mono text-[9px] leading-tight custom-scrollbar">
                 {terminalLogs.map((log, i) => (
                   <div key={i} className={`mb-1 ${log.includes("SUCCESS") ? "text-emerald-500" : log.includes("CRITICAL") ? "text-rose-500" : "text-slate-500"}`}>
                     <span className="opacity-30 mr-2 whitespace-nowrap">{terminalLogs.length - i}</span>

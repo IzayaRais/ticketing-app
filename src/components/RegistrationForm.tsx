@@ -160,6 +160,22 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
     }
   }, []);
 
+  // UI-level Restriction
+  if (selectedInstitute === "BUP" || selectedInstitute === "AFMC" || university === "BUP" || university === "AFMC") {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="w-20 h-20 bg-maroon-700/10 rounded-3xl flex items-center justify-center mb-6 border border-maroon-700/10">
+          <AlertCircle className="w-10 h-10 text-maroon-700" />
+        </div>
+        <h3 className="text-2xl font-black text-maroon-950 tracking-tight mb-3">Registration Closed</h3>
+        <p className="text-slate-500 font-medium max-w-xs leading-relaxed">
+          The registration quota for <span className="text-maroon-700 font-bold">{selectedInstitute || university}</span> is currently full.
+          <br /><span className="text-sm mt-2 block">Try again next time.</span>
+        </p>
+      </div>
+    );
+  }
+
   if (success) {
     return (
       <div className="text-center py-12">

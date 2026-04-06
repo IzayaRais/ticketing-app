@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import { registrationSchema } from "@/lib/validations";
 import { appendToSheet, getTicketByEmail } from "@/lib/googleSheets";
@@ -64,6 +64,15 @@ export async function POST(request: Request) {
     }
 
     const { data } = result;
+
+    // Enforcement for Quota Restriction
+    if (data.university === "BUP" || data.university === "AFMC") {
+      return NextResponse.json(
+        { message: `Registration Quota for ${data.university} is full. Try again next time.` },
+        { status: 403 }
+      );
+    }
+
     const normalizedData = {
       ...data,
       phone: normalizeBdPhone(data.phone),
@@ -123,4 +132,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

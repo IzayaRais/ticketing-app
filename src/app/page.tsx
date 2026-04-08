@@ -62,18 +62,27 @@ function CountdownTimer() {
 
 export default function LandingPage() {
   const [showReg, setShowReg] = useState(false);
-  const [quotaMessage, setQuotaMessage] = useState<string | null>(null);
-  const [selectedInst, setSelectedInst] = useState<string | null>(null);
+  const [registrationClosed, setRegistrationClosed] = useState(false);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("selectedInstitute");
-    setSelectedInst(stored);
+    const fetchConfig = async () => {
+      try {
+        const res = await fetch("/api/admin/config", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          setRegistrationClosed(!data.registrationEnabled);
+        }
+      } catch {
+        // fail open
+      }
+    };
+    fetchConfig();
   }, []);
 
   const handleConfirmedClick = () => {
-    if (selectedInst === "BUP" || selectedInst === "AFMC") {
-      setQuotaMessage(`Registration Quota for ${selectedInst} is full. Try again next time.`);
-      setTimeout(() => setQuotaMessage(null), 5000); // Hide after 5s
+    if (registrationClosed) {
+      sessionStorage.setItem("skipRegistrationClosedOverlay", "1");
+      window.location.href = "/dashboard";
       return;
     }
     setShowReg(true);
@@ -152,9 +161,9 @@ export default function LandingPage() {
               <div className="flex flex-wrap gap-4 mb-12">
                 <button
                   onClick={handleConfirmedClick}
-                  className="btn-primary px-10 py-5 rounded-2xl text-lg font-black group shadow-2xl shadow-maroon-700/20 shadow-[0_20px_50px_rgba(128,0,0,0.15)] bg-slate-900 border-none hover:bg-black"
+                  className={`btn-primary px-10 py-5 rounded-2xl text-lg font-black group shadow-2xl shadow-maroon-700/20 shadow-[0_20px_50px_rgba(128,0,0,0.15)] border-none ${registrationClosed ? "bg-maroon-700 hover:bg-maroon-800" : "bg-slate-900 hover:bg-black"}`}
                 >
-                  Confirm Registration
+                  {registrationClosed ? "Download Ticket" : "Confirm Registration"}
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <a
@@ -423,24 +432,6 @@ export default function LandingPage() {
 
               <RegistrationForm />
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {quotaMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 30 }}
-            exit={{ opacity: 0, y: -50 }}
-            className="fixed top-0 left-1/2 -translate-x-1/2 z-[200] max-w-sm w-full"
-          >
-            <div className="mx-4 p-4 bg-maroon-700 text-white font-black rounded-2xl shadow-2xl flex items-center gap-3 border border-maroon-600">
-              <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center shrink-0">
-                 <ShieldCheck className="w-5 h-5" />
-              </div>
-              <p className="text-sm tracking-tight">{quotaMessage}</p>
-            </div>
           </motion.div>
         )}
       </AnimatePresence>

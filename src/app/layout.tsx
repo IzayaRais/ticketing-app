@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
-import InstituteGate from "@/components/InstituteGate";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://antorip.vercel.app";
 const ogImage = "/og-image.jpg";
@@ -53,7 +52,6 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased font-sans">
         <AuthProvider>
-          <InstituteGate />
           <RegistrationCountdownOverlay />
           {children}
         </AuthProvider>

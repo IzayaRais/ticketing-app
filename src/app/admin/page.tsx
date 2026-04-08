@@ -7,7 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Users, UserCheck, UserX, Download, Search, 
   ArrowUpDown, Ticket, GraduationCap, Droplets,
-  ChevronDown, Shield, LogOut, Filter, RefreshCw, QrCode, CheckCircle2, Clock, Power, Settings
+  ChevronDown, Shield, LogOut, Filter, RefreshCw, QrCode, CheckCircle2, Clock, Power, Settings,
+  ChevronLeft, ChevronRight
 } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -94,8 +95,8 @@ export default function AdminDashboard() {
   const [lastSyncedAt, setLastSyncedAt] = useState<string>("");
   const previousSnapshotRef = useRef<Map<string, { checkedIn: string }>>(new Map());
   const initializedRef = useRef(false);
-  const [appConfig, setAppConfig] = useState<{ registrationEnabled: boolean; pauseUntil: string | null } | null>(null);
-  const [configLoading, setConfigLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 50;
 
   useEffect(() => {
     let count = 0;
@@ -205,33 +206,7 @@ export default function AdminDashboard() {
     }
   }, []);
 
-  const fetchConfig = useCallback(async () => {
-    try {
-      const res = await fetch("/api/admin/config", { cache: "no-store" });
-      const data = await res.json();
-      if (res.ok) setAppConfig(data);
-    } catch (error) {
-      console.error("Error fetching config:", error);
-    }
-  }, []);
 
-  const handleToggleRegistration = async () => {
-    if (!appConfig) return;
-    setConfigLoading(true);
-    try {
-      const res = await fetch("/api/admin/config", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ registrationEnabled: !appConfig.registrationEnabled }),
-      });
-      const data = await res.json();
-      if (res.ok) setAppConfig(data);
-    } catch (error) {
-      console.error("Error toggling registration:", error);
-    } finally {
-      setConfigLoading(false);
-    }
-  };
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -242,11 +217,10 @@ export default function AdminDashboard() {
       }
       fetchData();
       fetchScannerUsers();
-      fetchConfig();
     } else if (status === "unauthenticated") {
       setLoading(false);
     }
-  }, [status, session, fetchData, fetchScannerUsers, fetchConfig]);
+  }, [status, session, fetchData, fetchScannerUsers]);
 
   useEffect(() => {
     if (status !== "authenticated" || session?.user?.role !== "admin") return;
@@ -343,6 +317,24 @@ export default function AdminDashboard() {
       if (aVal > bVal) return sortOrder === "asc" ? 1 : -1;
       return 0;
     });
+
+  const totalPages = Math.max(1, Math.ceil(filteredTickets.length / itemsPerPage));
+  const paginatedTickets = filteredTickets.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+  const startItem = filteredTickets.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const endItem = Math.min(currentPage * itemsPerPage, filteredTickets.length);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, genderFilter, universityFilter, bloodGroupFilter, dateFilter, scanStatusFilter, sortField, sortOrder]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const downloadCSV = () => {
     const headers = ["Ticket ID", "Full Name", "Email", "Phone", "Student ID", "University", "Gender", "Blood Group", "Payment Method", "Transaction ID", "Payment Number", "Payment From Number", "Status", "Timestamp", "Scanned", "Checked In At", "Scanned By"];
@@ -550,54 +542,13 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="lg:col-span-1 bg-white rounded-2xl p-6 shadow-lg border border-slate-100 flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Settings className="w-5 h-5 text-maroon-700" />
-                <h3 className="font-black text-slate-800">Registration Control</h3>
-              </div>
-              <p className="text-sm text-slate-500 mb-6">
-                Enable or disable the registration form globally. When disabled, users will see a "Registration Closed" message.
-              </p>
-            </div>
-            
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${appConfig?.registrationEnabled ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                  <Power className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-800">Registration Status</p>
-                  <p className="text-xs text-slate-500">{appConfig?.registrationEnabled ? 'Currently Active' : 'Currently Paused'}</p>
-                </div>
-              </div>
-              
-              <button
-                onClick={handleToggleRegistration}
-                disabled={configLoading || !appConfig}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                   appConfig?.registrationEnabled ? 'bg-green-600' : 'bg-slate-300'
-                } ${configLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    appConfig?.registrationEnabled ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-          </motion.div>
+
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="lg:col-span-2 bg-white rounded-2xl p-4 md:p-6 shadow-lg border border-slate-100"
+            className="lg:col-span-3 bg-white rounded-2xl p-4 md:p-6 shadow-lg border border-slate-100"
           >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
             <div>
@@ -888,16 +839,6 @@ export default function AdminDashboard() {
                       Blood
                     </span>
                   </th>
-                  <th className="px-4 py-3 text-left hidden xl:table-cell">
-                    <span className="flex items-center gap-1 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      Payment
-                    </span>
-                  </th>
-                  <th className="px-4 py-3 text-left hidden xl:table-cell">
-                    <span className="flex items-center gap-1 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      Txn ID
-                    </span>
-                  </th>
                   <th className="px-4 py-3 text-left">
                     <button 
                       onClick={() => handleSort("timestamp")}
@@ -915,9 +856,9 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredTickets.length === 0 ? (
+                {paginatedTickets.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="px-6 py-16 text-center">
+                    <td colSpan={7} className="px-6 py-16 text-center">
                       <div className="flex flex-col items-center gap-2">
                         <Users className="w-12 h-12 text-slate-200" />
                         <p className="text-slate-400 font-medium">No registrations found</p>
@@ -926,7 +867,7 @@ export default function AdminDashboard() {
                     </td>
                   </tr>
                 ) : (
-                  filteredTickets.map((ticket, i) => (
+                  paginatedTickets.map((ticket, i) => (
                     <motion.tr
                       key={ticket.ticketId}
                       initial={{ opacity: 0 }}
@@ -960,27 +901,6 @@ export default function AdminDashboard() {
                       <td className="px-4 py-3 hidden lg:table-cell">
                         <span className="text-sm font-bold text-red-600">{ticket.bloodGroup}</span>
                       </td>
-                      <td className="px-4 py-3 hidden xl:table-cell">
-                        {ticket.paymentMethod ? (
-                          <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold border border-emerald-200">
-                            {ticket.paymentMethod}
-                          </span>
-                        ) : (
-                          <span className="text-xs font-semibold text-slate-400">N/A</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 hidden xl:table-cell">
-                        {ticket.transactionId ? (
-                          <div className="space-y-1">
-                            <p className="font-mono text-xs font-bold text-slate-700">{ticket.transactionId}</p>
-                            {ticket.paymentFromNumber ? (
-                              <p className="text-[11px] text-slate-500">From: {ticket.paymentFromNumber}</p>
-                            ) : null}
-                          </div>
-                        ) : (
-                          <span className="text-xs font-semibold text-slate-400">N/A</span>
-                        )}
-                      </td>
                   <td className="px-4 py-3">
                     <p className="text-xs text-slate-400">
                       {new Date(ticket.timestamp).toLocaleDateString("en-GB", {
@@ -1013,13 +933,43 @@ export default function AdminDashboard() {
             </table>
           </div>
 
-          <div className="px-4 md:px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-sm text-slate-500 font-medium">
-              Showing <span className="text-slate-800 font-bold">{filteredTickets.length}</span> of <span className="text-slate-800 font-bold">{tickets.length}</span> registrations
-            </p>
+          <div className="px-4 md:px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-slate-500 font-medium">
+              <p>
+                Showing <span className="text-slate-800 font-bold">{startItem}-{endItem}</span> of <span className="text-slate-800 font-bold">{filteredTickets.length}</span> results
+              </p>
+              {totalPages > 1 && (
+                <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-1 shadow-sm">
+                  <button
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-2.5 py-1.5 rounded-md hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-slate-600 text-xs font-bold uppercase tracking-wider inline-flex items-center gap-1"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </button>
+                  
+                  <div className="flex items-center px-2 gap-2 border-x border-slate-100">
+                    <span className="text-slate-400 text-xs uppercase tracking-widest font-black">Page</span>
+                    <span className="text-maroon-700 font-black text-sm min-w-[1.5rem] text-center">{currentPage}</span>
+                    <span className="text-slate-300 font-medium">/</span>
+                    <span className="text-slate-500 font-bold text-sm">{totalPages}</span>
+                  </div>
+
+                  <button
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-2.5 py-1.5 rounded-md hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-slate-600 text-xs font-bold uppercase tracking-wider inline-flex items-center gap-1"
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+            </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400">
-                {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+              <span className="text-xs text-slate-400 font-bold bg-white border border-slate-200 px-3 py-1.5 rounded-full shadow-sm">
+                {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
               </span>
             </div>
           </div>

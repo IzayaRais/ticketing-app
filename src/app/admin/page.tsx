@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Users, UserCheck, UserX, Download, Search, 
   ArrowUpDown, Ticket, GraduationCap, Droplets,
-  ChevronDown, Shield, LogOut, Filter, RefreshCw, QrCode, CheckCircle2, Clock
+  ChevronDown, Shield, LogOut, Filter, RefreshCw, QrCode, CheckCircle2, Clock, Power, Settings
 } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -94,6 +94,8 @@ export default function AdminDashboard() {
   const [lastSyncedAt, setLastSyncedAt] = useState<string>("");
   const previousSnapshotRef = useRef<Map<string, { checkedIn: string }>>(new Map());
   const initializedRef = useRef(false);
+  const [appConfig, setAppConfig] = useState<{ registrationEnabled: boolean; pauseUntil: string | null } | null>(null);
+  const [configLoading, setConfigLoading] = useState(false);
 
   useEffect(() => {
     let count = 0;
@@ -203,6 +205,34 @@ export default function AdminDashboard() {
     }
   }, []);
 
+  const fetchConfig = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/config", { cache: "no-store" });
+      const data = await res.json();
+      if (res.ok) setAppConfig(data);
+    } catch (error) {
+      console.error("Error fetching config:", error);
+    }
+  }, []);
+
+  const handleToggleRegistration = async () => {
+    if (!appConfig) return;
+    setConfigLoading(true);
+    try {
+      const res = await fetch("/api/admin/config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ registrationEnabled: !appConfig.registrationEnabled }),
+      });
+      const data = await res.json();
+      if (res.ok) setAppConfig(data);
+    } catch (error) {
+      console.error("Error toggling registration:", error);
+    } finally {
+      setConfigLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (status === "authenticated") {
       const userRole = session?.user?.role;
@@ -212,10 +242,11 @@ export default function AdminDashboard() {
       }
       fetchData();
       fetchScannerUsers();
+      fetchConfig();
     } else if (status === "unauthenticated") {
       setLoading(false);
     }
-  }, [status, session, fetchData, fetchScannerUsers]);
+  }, [status, session, fetchData, fetchScannerUsers, fetchConfig]);
 
   useEffect(() => {
     if (status !== "authenticated" || session?.user?.role !== "admin") return;
@@ -518,12 +549,56 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white rounded-2xl p-4 md:p-6 shadow-lg border border-slate-100 mb-6"
-        >
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="lg:col-span-1 bg-white rounded-2xl p-6 shadow-lg border border-slate-100 flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Settings className="w-5 h-5 text-maroon-700" />
+                <h3 className="font-black text-slate-800">Registration Control</h3>
+              </div>
+              <p className="text-sm text-slate-500 mb-6">
+                Enable or disable the registration form globally. When disabled, users will see a "Registration Closed" message.
+              </p>
+            </div>
+            
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${appConfig?.registrationEnabled ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                  <Power className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-800">Registration Status</p>
+                  <p className="text-xs text-slate-500">{appConfig?.registrationEnabled ? 'Currently Active' : 'Currently Paused'}</p>
+                </div>
+              </div>
+              
+              <button
+                onClick={handleToggleRegistration}
+                disabled={configLoading || !appConfig}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                   appConfig?.registrationEnabled ? 'bg-green-600' : 'bg-slate-300'
+                } ${configLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    appConfig?.registrationEnabled ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="lg:col-span-2 bg-white rounded-2xl p-4 md:p-6 shadow-lg border border-slate-100"
+          >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
             <div>
               <h3 className="font-black text-slate-800">Live Activity</h3>
@@ -572,6 +647,7 @@ export default function AdminDashboard() {
             )}
           </div>
         </motion.div>
+      </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

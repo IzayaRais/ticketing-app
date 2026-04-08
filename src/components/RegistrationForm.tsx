@@ -15,7 +15,7 @@ import {
 import { useRouter } from "next/navigation";
 import {
   Loader2, AlertCircle, CheckCircle2,
-  ArrowRight, Send, ChevronDown, X
+  ArrowRight, Send, ChevronDown, X, Lock as LockIcon
 } from "lucide-react";
 
 const bloodGroups = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"] as const;
@@ -71,7 +71,26 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
   const [selectedInstitute, setSelectedInstitute] = useState<Institute | null>(null);
   const [copiedPaymentNumber, setCopiedPaymentNumber] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [appConfig, setAppConfig] = useState<{ registrationEnabled: boolean } | null>(null);
+  const [configLoading, setConfigLoading] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const res = await fetch("/api/admin/config", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          setAppConfig(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch config:", error);
+      } finally {
+        setConfigLoading(false);
+      }
+    };
+    fetchConfig();
+  }, []);
 
   const {
     register,
@@ -159,6 +178,29 @@ export default function RegistrationForm({ onSuccess }: { onSuccess?: (ticketId:
       setCopiedPaymentNumber(false);
     }
   }, []);
+
+  if (configLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[300px]">
+        <div className="w-8 h-8 border-4 border-maroon-700 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (appConfig && !appConfig.registrationEnabled) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="w-20 h-20 bg-amber-500/10 rounded-3xl flex items-center justify-center mb-6 border border-amber-500/10">
+          <LockIcon className="w-10 h-10 text-amber-500" />
+        </div>
+        <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-3 italic uppercase">Registration Paused</h3>
+        <p className="text-slate-500 font-medium max-w-xs leading-relaxed">
+          The registration form has been temporarily disabled by the administrator. 
+          <br /><span className="text-sm mt-2 block font-semibold text-rose-500 underline underline-offset-4 decoration-rose-500/30">Please check back again soon!</span>
+        </p>
+      </div>
+    );
+  }
 
   // UI-level Restriction
   if (selectedInstitute === "BUP" || selectedInstitute === "AFMC" || university === "BUP" || university === "AFMC") {

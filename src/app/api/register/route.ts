@@ -43,6 +43,8 @@ function normalizeBdPhone(value: string): string {
   return cleaned;
 }
 
+import { isRegistrationOpen } from "@/lib/appConfig";
+
 export async function POST(request: Request) {
   const ip = getClientIp(request);
   if (!checkRateLimit(ip)) {
@@ -52,32 +54,22 @@ export async function POST(request: Request) {
     );
   }
 
+  if (!isRegistrationOpen()) {
+    return NextResponse.json(
+      { message: "Registration is currently closed by the administrator." },
+      { status: 403 }
+    );
+  }
+
   try {
-    const body = await request.json();
-    const result = registrationSchema.safeParse(body);
-
-    if (!result.success) {
-      return NextResponse.json(
-        { message: "Invalid registration data", errors: result.error.flatten() },
-        { status: 400 }
-      );
-    }
-
-    const { data } = result;
-
-    // Enforcement for Quota Restriction
-    if (data.university === "BUP" || data.university === "AFMC") {
-      return NextResponse.json(
-        { message: `Registration Quota for ${data.university} is full. Try again next time.` },
-        { status: 403 }
-      );
-    }
+    const data = await request.json();
+    const validatedData = registrationSchema.parse(data);
 
     const normalizedData = {
-      ...data,
-      phone: normalizeBdPhone(data.phone),
-      transactionId: data.transactionId?.trim().toUpperCase() || "",
-      paymentFromNumber: data.paymentFromNumber ? normalizeBdPhone(data.paymentFromNumber) : "",
+      ...validatedData,
+      phone: normalizeBdPhone(validatedData.phone),
+      transactionId: validatedData.transactionId?.trim().toUpperCase() || "",
+      paymentFromNumber: validatedData.paymentFromNumber ? normalizeBdPhone(validatedData.paymentFromNumber) : "",
     };
 
     const existing = await getTicketByEmail(normalizedData.email);

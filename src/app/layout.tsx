@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
 import InstituteGate from "@/components/InstituteGate";
@@ -42,6 +42,8 @@ export const metadata: Metadata = {
   },
 };
 
+import RegistrationCountdownOverlay from "@/components/RegistrationCountdownOverlay";
+
 export default function RootLayout({
   children,
 }: {
@@ -52,9 +54,11 @@ export default function RootLayout({
       <body className="antialiased font-sans">
         <AuthProvider>
           <InstituteGate />
+          <RegistrationCountdownOverlay />
           {children}
         </AuthProvider>
       </body>
     </html>
   );
 }
+
